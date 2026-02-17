@@ -1,0 +1,20 @@
+{
+  "name": "todo",
+  "version": "1.0.0",
+  "description": "узнать: Map Set https://learn.javascript.ru/map-set методы!!! Композиция VS Наследование 4.Class https://learn.javascript.ru/class - допройти,как надо будет 4.1 Переопределение полей родительского класса https://learn.javascript.ru/class-inheritance + задачи после главы  4.2 https://learn.javascript.ru/static-properties-methods - prototype не очень понятны, надо будет в будущем почитать + задачи 4.3 прочитала про приватные и защищенные свойства",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "pg": "^8.18.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}
