@@ -1,9 +1,4 @@
-import * as http from 'node:http';
-import { loadEnvFile } from 'node:process';
-
-loadEnvFile('/home/nikki/Desktop/todolist-repo/todo/.env');
-
-const server = http.createServer((request, response) => {
+export default handleRequest = (request, response) => {
 
     response.setHeader('Content-Type', 'text/html; charset=utf-8');
 
@@ -24,6 +19,6 @@ const server = http.createServer((request, response) => {
         response.write('<p>Not found</p>')
     }
     response.end();
-}).listen(process.env.PORT, function CollectionStatus() {
-    console.log(`Сервер запущен на порту http://localhost:${process.env.PORT}`);
-});
+}
+
+//какой метод, какой путь и какой контроллер вызвать
