@@ -1,24 +1,33 @@
-export default handleRequest = (request, response) => {
+import taskController from "./controller.js";
+export default function (request, response) {
+    console.log(request.url);
+    console.log(request.method);
 
-    response.setHeader('Content-Type', 'text/html; charset=utf-8');
+    let status = 200;
 
-    if (request.url === '/' || request.url === '/todoapp') {
-        response.setHeader('Location', '/list-total-tasks');
-        response.statusCode = 302;
+    if (request.url === '/favicon.ico') {
+        status = 204;
+        response.writeHead(status, { 'Content-Type': 'text/html; charset=utf-8' });
+        return;
     }
-    else if (request.url === '/list-total-tasks') {
-        response.write('<p>Total Tasks</p>');
+    if (request.method === 'GET') {
+        status = 204;
+        response.writeHead(204);
+        return;
     }
-    else if (request.url === '/list-incomplete-tasks') {
-        response.write('<p>Incomplete tasks</p>');
-    }
-    else if (request.url === '/list-completed-tasks') {
-        response.write('<p>Completed tasks</p>');
-    }
-    else {
-        response.write('<p>Not found</p>')
+    switch (request.url) {
+        case '/':
+            break;
+        case '/list-total-tasks':
+            break;
+        case '/list-incomplete-tasks':
+            break;
+        case '/list-completed-tasks':
+            break;
+        default:
+            status = 204;
+            response.writeHead(status);
     }
     response.end();
-}
 
-//какой метод, какой путь и какой контроллер вызвать
+}
