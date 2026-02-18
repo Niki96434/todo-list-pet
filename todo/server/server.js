@@ -3,6 +3,12 @@ import { loadEnvFile } from 'node:process';
 import handleRequest from './routes.js';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { pool } from './db.js';
+
+pool.query('SELECT NOW()', (err, res) => {
+    if (err) throw new Error('бд не подключилась');
+    if (res) console.log('бд подключилась');
+});
 
 try {
     const __filename = fileURLToPath(import.meta.url);
