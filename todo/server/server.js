@@ -5,10 +5,6 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { pool } from './db.js';
 
-pool.query('SELECT NOW()', (err, res) => {
-    if (err) throw new Error('бд не подключилась');
-    if (res) console.log('бд подключилась');
-});
 
 try {
     const __filename = fileURLToPath(import.meta.url);
@@ -30,8 +26,22 @@ server.on('error', (error) => {
     console.log(`Ошибка сервера:`, error);
 });
 
+async function checkConnectDB() {
+    try {
+        const { row } = await pool.query(`SELECT NOW()`);
+        console.log('бд подключилась');
+        console.log({ row });
+    } catch (err) {
+        console.log(err.message);
+        console.log('бд не подключилась');
+    }
+}
+
+checkConnectDB();
+
 server.listen(PORT, HOST, function onServerStatus() {
     console.log(`Сервер запущен на порту http://${HOST}:${PORT}`);
 
 });
 
+// https://sql.holt.courses/lessons/data/nodejs-and-postgresql
