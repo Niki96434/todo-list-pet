@@ -12,21 +12,19 @@ export default function (request, response) {
         return;
     }
     if (request.method === 'GET') {
-        response.writeHead(status, { 'Content-Type': 'application/json' });
         switch (request.url) {
             case '/':
             case '/list-total-tasks':
                 taskController.getTotalTask(request, response) // выводит все задачи
             case '/list-incomplete-tasks':
-                return taskController.getIncompleteTask(request, response) // выводит незавершенные задачи
+                return taskController.getIncompleteTasks(request, response) // выводит незавершенные задачи
             case '/list-completed-tasks':
-                return taskController.getCompleteTask(request, response) // выводит завершенные задачи
+                return taskController.getCompleteTasks(request, response) // выводит завершенные задачи
             default:
                 status = 404;
                 response.writeHead(status);
                 response.end('нет контента');
         }
-        response.end('этот адрес невалиден')
     }
     if (request.method === 'POST') {
         response.writeHead(status, { 'Content-Type': 'application/json' });
@@ -35,9 +33,9 @@ export default function (request, response) {
             case '/list-total-tasks':
                 taskController.addTask(request, response) // выводит все задачи
             case '/list-incomplete-tasks':
-                return taskController.getIncompleteTask(request, response) // выводит незавершенные задачи
+                return taskController.getIncompleteTasks(request, response) // выводит незавершенные задачи
             case '/list-completed-tasks':
-                return taskController.getCompleteTask(request, response) // выводит завершенные задачи
+                return taskController.getCompleteTasks(request, response) // выводит завершенные задачи
             default:
                 status = 404;
                 response.writeHead(status);

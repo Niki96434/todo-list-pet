@@ -1,8 +1,8 @@
-import { validateTaskProperty } from "./validation.js";
+import { validateTaskFields } from "./validation.js";
 export class Task {
     #id
-    constructor(id, title, description, deadline, priority, dateOfCreation, completed = false) {
-        validateTaskProperty(title, description, deadline, priority, completed);
+    constructor(id, title, description, deadline, priority, dateOfCreation, user_id, completed = false) {
+        validateTaskFields(title, description, deadline, priority, completed);
 
         this.#id = id;
         this.title = title;
@@ -12,17 +12,18 @@ export class Task {
         this.priority = priority;
         this.dateOfCreation = new Date();
         this.completed = completed;
+        this.user_id = user_id;
     }
     get id() {
         return this.#id
     }
 }
-const task = new Task(1, 'решать эконометрику', 'описание', '23.02.2026', 'важно', '22.02.2026');
-const taskJSON = JSON.stringify(task); // вместо new date будет строка
-const taskParse = JSON.parse(taskJSON, function (key, value) {
-    if (key === 'dateOfCreation') return value = new Date;
-    return value
-});
-let date = taskParse.dateOfCreation.getDate(); // 22 февраля
-console.log(date);
+// const task = new Task(1, 'решать эконометрику', 'описание', '23.02.2026', 'важно', '22.02.2026');
+// const taskJSON = JSON.stringify(task); // вместо new date будет строка
+// const taskParse = JSON.parse(taskJSON, function (key, value) {
+//     if (key === 'dateOfCreation') return value = new Date;
+//     return value
+// });
+// let date = taskParse.dateOfCreation.getDate(); // 22 февраля
+// console.log(date);
 // console.log(json);

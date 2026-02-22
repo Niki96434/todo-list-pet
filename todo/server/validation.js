@@ -18,15 +18,16 @@ export class PropertyRequiredError extends ValidationError {
 // правило 1 функция - 1 задача
 // сначала проверяем, пустые ли поля, а только затем формат
 
-export function validateRequiredPropertyTask(title, description, deadline, priority, completed) { // spread оператор раскрывает объект на свойства
-    if (!title.trim()) throw new PropertyRequiredError("title");
-    if (!description.trim()) throw new PropertyRequiredError("description");
-    if (!deadline.trim()) throw new PropertyRequiredError("deadline");
-    if (!priority.trim()) throw new PropertyRequiredError("priority");
+export function validateTaskFields({ title, description, deadline, priority, user_id, completed }) { // spread оператор раскрывает объект на свойства
+    if (!title || title.trim() === '') throw new PropertyRequiredError("title");
+    if (!description || description.trim() === '') throw new PropertyRequiredError("description");
+    if (!deadline || deadline.trim() === '') throw new PropertyRequiredError("deadline");
+    if (!priority || priority.trim() === '') throw new PropertyRequiredError("priority");
     if (typeof completed == 'undefined') throw new PropertyRequiredError("completed");
+    if (!user_id || user_id.toString().trim() === '') throw new PropertyRequiredError("user_id");
 }
 // правильно ли ввели данные для задачи
-export function validateTaskProperty(title, description, deadline, priority, completed) {
+export function validateTaskData({ title, description, deadline, priority, user_id, completed }) {
     const TITLE_MIN_LENGTH = 3;
     const TITLE_MAX_LENGTH = 100;
     const DESCRIPTION_MAX_LENGTH = 1000;
@@ -49,6 +50,9 @@ export function validateTaskProperty(title, description, deadline, priority, com
 
     if (typeof completed !== 'boolean') {
         throw new ValidationError('Невалидно')
+    }
+    if (typeof user_id !== 'number') {
+        throw new ValidationError('невалидно')
     }
 }
 
