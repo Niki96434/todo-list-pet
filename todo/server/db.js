@@ -14,10 +14,3 @@ export const pool = new Pool({
     password: PGPASSWORD,
     port: PGPORT || 5432,
 });
-
-const post = ['Пойти к дерматологу', '19.02.26'];
-
-// pool.query(`INSERT INTO posts(title, date) VALUES(?, ?)`, post, (err, res) => {
-//     if (err) throw new Error('пост не добавился');
-//     if (res) console.log('пост успешно добавился');
-// })

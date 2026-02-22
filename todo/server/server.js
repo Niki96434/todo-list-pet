@@ -1,6 +1,6 @@
 import * as http from 'node:http';
 import { loadEnvFile } from 'node:process';
-import handleRequest from './routes.js';
+import handleRequest from './post.routes.js';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { pool } from './db.js';
@@ -27,14 +27,14 @@ server.on('error', (error) => {
 });
 
 async function checkConnectDB() {
-    try {
-        const { row } = await pool.query(`SELECT NOW()`);
-        console.log('бд подключилась');
-        console.log({ row });
-    } catch (err) {
-        console.log(err.message);
-        console.log('бд не подключилась');
-    }
+    await pool.query(`SELECT NOW()`, (err, res) => {
+        if (!err) {
+            console.log('бд подключилась');
+            const { rows } = res;
+            console.log(rows[0])
+        }
+        return null;
+    })
 }
 
 checkConnectDB();
@@ -44,4 +44,3 @@ server.listen(PORT, HOST, function onServerStatus() {
 
 });
 
-// https://sql.holt.courses/lessons/data/nodejs-and-postgresql
