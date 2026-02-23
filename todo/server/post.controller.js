@@ -46,10 +46,27 @@ export default class taskController {
 
     }
 
-    static getOneTask(request, response) {
+    static getOneTask(request, response) { // GET task/:id {id: 1}
+        let body = '';
+        request.on('data')
+            .then((chunk) => body += chunk)
+            .then((body) => console.log(body))
+            .catch((err) => console.log(`невалидный запрос(json) - ${err}`));
+        request.on('end')
+            .then((body) => JSON.parse(body))
+            .catch((err) => `невалидный JSON ${err}`)
+            .then((data) => { const { id } = data })
+            .catch((err) => console.log(`деструктуризация не прошла - ${err}`))
+            .then(id => find(id)) // здесь какая-то функция, которая ищет в бд по айди задачу, и возвращает объект задачи
+            .then((id) => {
+                response.writeHead(200, { 'Content-Type': 'application/json' });
+                response.end(JSON.stringify({
+                    success: true,
+                    task: { id: task.id, title: task.title, description: task.description }
+                }))
 
+            })
     }
-
     static getTotalTasks(request, response) {
 
     }

@@ -15,11 +15,13 @@ export default function (request, response) {
         switch (request.url) {
             case '/':
             case '/list-total-tasks':
-                taskController.getTotalTask(request, response) // выводит все задачи
+                taskController.getTotalTasks(request, response) // выводит все задачи
             case '/list-incomplete-tasks':
                 return taskController.getIncompleteTasks(request, response) // выводит незавершенные задачи
             case '/list-completed-tasks':
                 return taskController.getCompleteTasks(request, response) // выводит завершенные задачи
+            case '/task/:id':
+                taskController.getOneTask(request, response) // выводит 1 задачу
             default:
                 status = 404;
                 response.writeHead(status);
@@ -31,10 +33,6 @@ export default function (request, response) {
             case '/':
             case '/list-total-tasks':
                 taskController.addTask(request, response) // выводит все задачи
-            case '/list-incomplete-tasks':
-                return taskController.getIncompleteTasks(request, response) // выводит незавершенные задачи
-            case '/list-completed-tasks':
-                return taskController.getCompleteTasks(request, response) // выводит завершенные задачи
             default:
                 status = 404;
                 response.writeHead(status);
