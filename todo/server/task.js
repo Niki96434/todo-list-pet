@@ -1,22 +1,21 @@
 import { validateTaskFields } from "./validation.js";
 export class Task {
-    #id
-    constructor(id, title, description, deadline, priority, dateOfCreation, user_id, completed = false) {
-        validateTaskFields(title, description, deadline, priority, completed);
+    // #id
+    constructor(title, description, deadline, priority, user_id, completed = false) {
+        // validateTaskFields(title, description, deadline, priority, completed, user_id);
 
-        this.#id = id;
+        // this.#id = id;
         this.title = title;
         this.description = description;
-        this.completed = completed;
         this.deadline = deadline;
         this.priority = priority;
         this.dateOfCreation = new Date();
-        this.completed = completed;
         this.user_id = user_id;
+        this.completed = completed;
     }
-    get id() {
-        return this.#id
-    }
+    // get id() {
+    //     return this.#id
+    // }
 }
 // const task = new Task(1, 'решать эконометрику', 'описание', '23.02.2026', 'важно', '22.02.2026');
 // const taskJSON = JSON.stringify(task); // вместо new date будет строка

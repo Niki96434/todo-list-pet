@@ -27,7 +27,6 @@ export default function (request, response) {
         }
     }
     if (request.method === 'POST') {
-        response.writeHead(status, { 'Content-Type': 'application/json' });
         switch (request.url) {
             case '/':
             case '/list-total-tasks':

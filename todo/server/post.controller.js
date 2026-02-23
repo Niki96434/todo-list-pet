@@ -10,26 +10,36 @@ export default class taskController {
         });
         request.on('end', () => {
             try {
-                const data = JSON.parse(body);
-                const { title, description, deadline, priority, user_id, completed } = data;
-                validateTaskFields({ ...data });
-                validateTaskData({ ...data });
-                const task = new Task({ ...data });
-                response.statusCode = 201;
-                response.setHeader('Content-Type', 'application/json');
-                response.end(JSON.stringify({ success: true }));
-                console.log(data);
+                let data;
+                try {
+                    data = JSON.parse(body);
+                } catch (err) {
+                    response.writeHead(400, { 'Content-Type': 'application/json' });
+                    return response.end(JSON.stringify({ error: 'Неверный формат JSON' }));
+                }
+
+                validateTaskFields(data);
+                validateTaskData(data);
+
+                let { title, description, deadline, priority, user_id, completed } = data;
+                const task = new Task(title, description, deadline, priority, user_id, completed);
+
+                response.writeHead(201, { 'Content-Type': 'application/json' });
+                return response.end(JSON.stringify({
+                    success: true,
+                    task: { id: task.id, title: task.title, description: task.description }
+                }));
 
             } catch (err) {
                 if (err.name === 'PropertyRequiredError') {
                     response.statusCode = 400;
-                    response.end(JSON.stringify({ error: 'Не должно быть пустых полей.' }));
+                    return response.end(JSON.stringify({ error: 'Не должно быть пустых полей.' }));
                 } else if (err.name === 'ValidationError') {
                     response.statusCode = 400;
-                    response.end(JSON.stringify({ error: 'Invalid JSON' }));
+                    return response.end(JSON.stringify({ error: 'Ошибка валидации данных' }));
                 } else {
                     response.statusCode = 500;
-                    response.end(JSON.stringify({ error: 'Internal server error' }))
+                    return response.end(JSON.stringify({ error: 'Internal server error' }));
                 }
             }
         });
