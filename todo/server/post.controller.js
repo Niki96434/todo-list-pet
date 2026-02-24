@@ -7,9 +7,6 @@ export default class taskController {
         let body = '';
         request.on('data', (chunk) => {
             try {
-                if (!body) {
-                    console.log('пустое тело запроса');
-                }
                 body += chunk.toString();
             } catch (err) {
                 console.log(`Invalid JSON - ${err}`);
@@ -17,8 +14,12 @@ export default class taskController {
         });
         request.on('end', () => {
             let data;
-            //async await
+
             try {
+                if (!body) {
+                    response.writeHead(400, { 'Content-Type': 'application/json' });
+                    response.end(JSON.stringify({ error: 'пустое тело запроса' }));
+                }
                 data = JSON.parse(body);
             } catch (err) {
                 response.writeHead(400, { 'Content-Type': 'application/json' });
@@ -55,11 +56,11 @@ export default class taskController {
 
     }
 
-    static async getOneTask(request, response) { // GET task/:id {id: 1}
+    static getOneTask(request, response) { // GET task/:id {id: 1}
         let body = '';
         let data;
         request.on('data', (chunk) => {
-            // много синхронки
+            // много синхронки заменить на async/await
             try {
                 body += chunk.toString();
             } catch (err) {
