@@ -3,14 +3,16 @@ import { Task } from "./task.js";
 
 export default class taskController {
 
-    static async addTask(request, response) {
+    static addTask(request, response) {
         let body = '';
-        request.on('data', (chunk) => {
-            body += chunk.toString();
-        });
-        request.on('end', () => {
-            try {
+        request.on('data')
+            .then((chunk) => body += chunk.toString())
+            .catch(err => console.log(`Invalid JSON - ${err}`))
+            .then(body => console.log(body));
+        request.on('end')
+            .then(() => {
                 let data;
+
                 try {
                     data = JSON.parse(body);
                 } catch (err) {
@@ -18,31 +20,33 @@ export default class taskController {
                     return response.end(JSON.stringify({ error: 'Неверный формат JSON' }));
                 }
 
-                validateTaskFields(data);
-                validateTaskData(data);
+                try {
 
-                let { title, description, deadline, priority, user_id, completed } = data;
-                const task = new Task(title, description, deadline, priority, user_id, completed);
+                    validateTaskFields(data);
+                    validateTaskData(data);
 
-                response.writeHead(201, { 'Content-Type': 'application/json' });
-                return response.end(JSON.stringify({
-                    success: true,
-                    task: { id: task.id, title: task.title, description: task.description }
-                }));
+                    let { title, description, deadline, priority, user_id, completed } = data;
+                    const task = new Task(title, description, deadline, priority, user_id, completed);
 
-            } catch (err) {
-                if (err.name === 'PropertyRequiredError') {
-                    response.statusCode = 400;
-                    return response.end(JSON.stringify({ error: 'Не должно быть пустых полей.' }));
-                } else if (err.name === 'ValidationError') {
-                    response.statusCode = 400;
-                    return response.end(JSON.stringify({ error: 'Ошибка валидации данных' }));
-                } else {
-                    response.statusCode = 500;
-                    return response.end(JSON.stringify({ error: 'Internal server error' }));
+                    response.writeHead(201, { 'Content-Type': 'application/json' });
+                    return response.end(JSON.stringify({
+                        success: true,
+                        task: { id: task.id, title: task.title, description: task.description }
+                    }));
+
+                } catch (err) {
+                    if (err.name === 'PropertyRequiredError') {
+                        response.statusCode = 400;
+                        return response.end(JSON.stringify({ error: 'Не должно быть пустых полей.' }));
+                    } else if (err.name === 'ValidationError') {
+                        response.statusCode = 400;
+                        return response.end(JSON.stringify({ error: 'Ошибка валидации данных' }));
+                    } else {
+                        response.statusCode = 500;
+                        return response.end(JSON.stringify({ error: 'Internal server error' }));
+                    }
                 }
-            }
-        });
+            });
 
     }
 
