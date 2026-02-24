@@ -5,71 +5,92 @@ export default class taskController {
 
     static addTask(request, response) {
         let body = '';
-        request.on('data')
-            .then((chunk) => body += chunk.toString())
-            .catch(err => console.log(`Invalid JSON - ${err}`))
-            .then(body => console.log(body));
-        request.on('end')
-            .then(() => {
-                let data;
-
-                try {
-                    data = JSON.parse(body);
-                } catch (err) {
-                    response.writeHead(400, { 'Content-Type': 'application/json' });
-                    return response.end(JSON.stringify({ error: 'Неверный формат JSON' }));
+        request.on('data', (chunk) => {
+            try {
+                if (!body) {
+                    console.log('пустое тело запроса');
                 }
+                body += chunk.toString();
+            } catch (err) {
+                console.log(`Invalid JSON - ${err}`);
+            }
+        });
+        request.on('end', () => {
+            let data;
+            //async await
+            try {
+                data = JSON.parse(body);
+            } catch (err) {
+                response.writeHead(400, { 'Content-Type': 'application/json' });
+                response.end(JSON.stringify({ error: 'Неверный формат JSON' }));
+            }
 
-                try {
+            try {
 
-                    validateTaskFields(data);
-                    validateTaskData(data);
+                validateTaskFields(data);
+                validateTaskData(data);
 
-                    let { title, description, deadline, priority, user_id, completed } = data;
-                    const task = new Task(title, description, deadline, priority, user_id, completed);
+                let { title, description, deadline, priority, user_id, completed } = data;
+                const task = new Task(title, description, deadline, priority, user_id, completed);
 
-                    response.writeHead(201, { 'Content-Type': 'application/json' });
-                    return response.end(JSON.stringify({
-                        success: true,
-                        task: { id: task.id, title: task.title, description: task.description }
-                    }));
-
-                } catch (err) {
-                    if (err.name === 'PropertyRequiredError') {
-                        response.statusCode = 400;
-                        return response.end(JSON.stringify({ error: 'Не должно быть пустых полей.' }));
-                    } else if (err.name === 'ValidationError') {
-                        response.statusCode = 400;
-                        return response.end(JSON.stringify({ error: 'Ошибка валидации данных' }));
-                    } else {
-                        response.statusCode = 500;
-                        return response.end(JSON.stringify({ error: 'Internal server error' }));
-                    }
-                }
-            });
-
-    }
-
-    static getOneTask(request, response) { // GET task/:id {id: 1}
-        let body = '';
-        request.on('data')
-            .then((chunk) => body += chunk)
-            .then((body) => console.log(body))
-            .catch((err) => console.log(`невалидный запрос(json) - ${err}`));
-        request.on('end')
-            .then((body) => JSON.parse(body))
-            .catch((err) => `невалидный JSON ${err}`)
-            .then((data) => { const { id } = data })
-            .catch((err) => console.log(`деструктуризация не прошла - ${err}`))
-            .then(id => find(id)) // здесь какая-то функция, которая ищет в бд по айди задачу, и возвращает объект задачи
-            .then((id) => {
-                response.writeHead(200, { 'Content-Type': 'application/json' });
+                response.writeHead(201, { 'Content-Type': 'application/json' });
                 response.end(JSON.stringify({
                     success: true,
                     task: { id: task.id, title: task.title, description: task.description }
-                }))
+                }));
 
-            })
+            } catch (err) {
+                if (err.name === 'PropertyRequiredError') {
+                    response.statusCode = 400;
+                    response.end(JSON.stringify({ error: 'Не должно быть пустых полей.' }));
+                } else if (err.name === 'ValidationError') {
+                    response.statusCode = 400;
+                    response.end(JSON.stringify({ error: 'Ошибка валидации данных' }));
+                } else {
+                    response.statusCode = 500;
+                    response.end(JSON.stringify({ error: 'Internal server error' }));
+                }
+            }
+        });
+
+    }
+
+    static async getOneTask(request, response) { // GET task/:id {id: 1}
+        let body = '';
+        let data;
+        request.on('data', (chunk) => {
+            // много синхронки
+            try {
+                body += chunk.toString();
+            } catch (err) {
+                console.log(`невалидный запрос(json) - ${err}`)
+            }
+        });
+        request.on('end', () => {
+            try {
+                data = JSON.parse(body);
+            } catch (err) {
+                console.log(`невалидный JSON ${err}`);
+
+            }
+        });
+        try {
+            const { id } = data;
+        } catch (err) {
+            console.log(`не хватает переменных ${err}`);
+        }
+        try {
+            (id => find(id)) // здесь какая-то функция, которая ищет в бд по айди задачу, и возвращает объект задачи
+            response.writeHead(200, { 'Content-Type': 'application/json' });
+            response.end(JSON.stringify({
+                success: true
+            }))
+        } catch (err) {
+            response.writeHead(400, { 'Content-Type': 'application/json' });
+            response.end(JSON.stringify({
+                error: 'задачи с таким id не существует.'
+            }))
+        }
     }
     static getTotalTasks(request, response) {
 
@@ -86,4 +107,3 @@ export default class taskController {
 
     }
 }
-//отправляем данные сервису, читаем бади, валидируем, отправляем ответ сервису
