@@ -6,27 +6,16 @@ export default class taskController {
     static addTask(request, response) {
         let body = '';
         request.on('data', (chunk) => {
-            try {
-                body += chunk.toString();
-            } catch (err) {
-                console.log(`Invalid JSON - ${err}`);
-            }
+            body += chunk.toString();
         });
         request.on('end', () => {
-            let data;
-
             try {
-                if (!body) {
+                if (!body.trim()) {
                     response.writeHead(400, { 'Content-Type': 'application/json' });
                     response.end(JSON.stringify({ error: 'пустое тело запроса' }));
                 }
-                data = JSON.parse(body);
-            } catch (err) {
-                response.writeHead(400, { 'Content-Type': 'application/json' });
-                response.end(JSON.stringify({ error: 'Неверный формат JSON' }));
-            }
 
-            try {
+                const data = JSON.parse(body);
 
                 validateTaskFields(data);
                 validateTaskData(data);
@@ -42,13 +31,16 @@ export default class taskController {
 
             } catch (err) {
                 if (err.name === 'PropertyRequiredError') {
-                    response.statusCode = 400;
+                    response.writeHead(400, { 'Content-Type': 'application/json' });
                     response.end(JSON.stringify({ error: 'Не должно быть пустых полей.' }));
                 } else if (err.name === 'ValidationError') {
-                    response.statusCode = 400;
+                    response.writeHead(400, { 'Content-Type': 'application/json' });
                     response.end(JSON.stringify({ error: 'Ошибка валидации данных' }));
+                } else if (err instanceof SyntaxError) {
+                    response.writeHead(400, { 'Content-Type': 'application/json' });
+                    response.end(JSON.stringify({ error: 'Неверный формат JSON' }));
                 } else {
-                    response.statusCode = 500;
+                    response.writeHead(500, { 'Content-Type': 'application/json' });
                     response.end(JSON.stringify({ error: 'Internal server error' }));
                 }
             }
@@ -56,42 +48,59 @@ export default class taskController {
 
     }
 
-    static getOneTask(request, response) { // GET task/:id {id: 1}
+    static async getOneTask(request, response) { // GET task/:id {id: 1}
         let body = '';
-        let data;
         request.on('data', (chunk) => {
-            // много синхронки заменить на async/await
-            try {
-                body += chunk.toString();
-            } catch (err) {
-                console.log(`невалидный запрос(json) - ${err}`)
-            }
+            body += chunk.toString();
         });
-        request.on('end', () => {
+        request.on('end', async () => {
             try {
-                data = JSON.parse(body);
-            } catch (err) {
-                console.log(`невалидный JSON ${err}`);
 
+                if (body.trim() === '') {
+                    throw new Error('EMPTY_BODY')
+                }
+
+                const data = JSON.parse(body);
+                if (!data.id) {
+                    throw new Error('ID_NOT_EXIST');
+                }
+
+                const { id } = data;
+
+                // id должен быть из url, а не из тела(сразу получать id должен)
+                const res = await find(id); // здесь какая-то функция с промисом, которая ищет в бд по айди задачу, и возвращает объект задачи
+
+                response.writeHead(200, { 'Content-Type': 'application/json' });
+                response.end(JSON.stringify({
+                    success: true
+                }))
+            } catch (err) {
+                if (err instanceof SyntaxError) {
+                    response.writeHead(400, { 'Content-Type': 'application/json' });
+                    response.end(JSON.stringify({
+                        error: 'неверный формат json'
+                    }))
+                }
+                if (err.name === 'EMPTY_BODY') {
+                    response.writeHead(400, { 'Content-Type': 'application/json' });
+                    response.end(JSON.stringify({
+                        error: 'пустое тело запроса'
+                    }))
+                }
+                if (err.name === 'ID_NOT_EXIST') {
+                    response.writeHead(400, { 'Content-Type': 'application/json' });
+                    response.end(JSON.stringify({
+                        error: 'задачи с таким id не найдено'
+                    }))
+                }
+                if (err) {
+                    response.writeHead(500, { 'Content-Type': 'application/json' });
+                    response.end(JSON.stringify({
+                        error: 'server error'
+                    }))
+                }
             }
-        });
-        try {
-            const { id } = data;
-        } catch (err) {
-            console.log(`не хватает переменных ${err}`);
-        }
-        try {
-            (id => find(id)) // здесь какая-то функция, которая ищет в бд по айди задачу, и возвращает объект задачи
-            response.writeHead(200, { 'Content-Type': 'application/json' });
-            response.end(JSON.stringify({
-                success: true
-            }))
-        } catch (err) {
-            response.writeHead(400, { 'Content-Type': 'application/json' });
-            response.end(JSON.stringify({
-                error: 'задачи с таким id не существует.'
-            }))
-        }
+        })
     }
     static getTotalTasks(request, response) {
 

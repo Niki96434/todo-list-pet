@@ -55,5 +55,3 @@ export function validateTaskData({ title, description, deadline, priority, user_
         throw new ValidationError('невалидно')
     }
 }
-
-// title, description, deadline, priority, completed
