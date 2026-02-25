@@ -5,6 +5,10 @@ import { RepositoryPost } from "./post.repository.js";
 
 export default class taskController {
 
+    constructor(RepositoryPost) {
+        this.repository = RepositoryPost;
+    }
+
     static addTask(request, response) {
         let body = '';
         request.on('data', (chunk) => {
@@ -58,11 +62,14 @@ export default class taskController {
         const task_id = task_url.at(-1);
 
         try {
-
-            if (typeof task_id !== 'number') { // проверку улучшить
+            /**
+            * @todo улучшить проверку
+            * @body хуевая проверка!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            */
+            if (typeof task_id !== 'number') {
                 throw new Error('ID_NOT_VALID')
             }
-            const res = await RepositoryPost.getOneTask(task_id);
+            const res = await this.repository.findByID(task_id);
 
             const { title, description, deadline, priority } = res;
 
@@ -97,7 +104,7 @@ export default class taskController {
         const task_url = request.url.split('/');
         const task_id = task_url.at(-1);
 
-        const del = await RepositoryPost.delTask(task_id);
+        const del = await this.repository.delTask(task_id);
 
         del.catch(err => {
             response.writeHead(400, { 'Content-Type': 'application/json' });
