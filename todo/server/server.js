@@ -27,7 +27,7 @@ server.on('error', (error) => {
 });
 
 async function checkConnectDB() {
-    await pool.query(`SELECT NOW()`, (err, res) => {
+    pool.query(`SELECT NOW()`, (err, res) => {
         if (!err) {
             console.log('бд подключилась');
             const { rows } = res;

@@ -1,7 +1,7 @@
 import { validateTaskFields } from "./validation.js";
 export class Task {
     // #id
-    constructor(title, description, deadline, priority, user_id, completed = false) {
+    constructor(title, description, deadline, priority, completed = false) {
         // validateTaskFields(title, description, deadline, priority, completed, user_id);
 
         // this.#id = id;
@@ -10,7 +10,6 @@ export class Task {
         this.deadline = deadline;
         this.priority = priority;
         this.dateOfCreation = new Date();
-        this.user_id = user_id;
         this.completed = completed;
     }
     // get id() {

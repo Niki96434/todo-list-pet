@@ -14,6 +14,7 @@ export default class taskController {
                 if (!body.trim()) {
                     response.writeHead(400, { 'Content-Type': 'application/json' });
                     response.end(JSON.stringify({ error: 'пустое тело запроса' }));
+                    return;
                 }
 
                 const data = JSON.parse(body);
@@ -25,11 +26,11 @@ export default class taskController {
 
                 const task = await pool.query('INSERT INTO Task (title, description, deadline, priority) values ($1, $2, $3, $4) RETURNING *', [title, description, deadline, priority]);
 
-                // const newTask = new Task(title, description, deadline, priority, user_id, completed);
+                const newTask = new Task(title, description, deadline, priority);
+
                 if (task && newTask) {
                     response.writeHead(201, { 'Content-Type': 'text/html; charset=UTF-8' });
-                    // response.write(`<p>${newTask}</p>`);
-                    response.end(`<p>${task}</p>`);
+                    response.end(`<p>${newTask.title}</p>`);
                 }
 
             } catch (err) {
@@ -60,10 +61,14 @@ export default class taskController {
             if (typeof task_id !== 'number') { // проверку улучшить
                 throw new Error('ID_NOT_VALID')
             }
-            const res = await find(task_id); // здесь какая-то функция с промисом, которая ищет в бд по айди задачу, и возвращает объект задачи
+            const res = await pool.query('SELECT * FROM Task WHERE id = $1 RETURNING *', [task_id]);
+
+            const { title, description, deadline, priority } = res;
+
+            const task = new Task(title, description, deadline, priority);
 
             response.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
-            response.end(`<p>${res}</p>`);
+            response.end(`<p>${task.title}</p>`);
 
         } catch (err) {
             if (err.name === 'ID_NOT_VALID') {
@@ -86,11 +91,11 @@ export default class taskController {
             }
         }
     }
-    static getTotalTasks(request, response) {
 
+    static async deleteTask(request, response) {
+        const res = await pool.query('DELETE FROM Task WHERE id = ?', [task_id]);
     }
-
-    static deleteTask(request, response) {
+    static getTotalTasks(request, response) {
 
     }
     static getIncompleteTasks(request, response) {
