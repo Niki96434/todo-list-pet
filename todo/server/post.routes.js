@@ -21,24 +21,15 @@ export default function (request, response) {
             case '/list-completed-tasks':
                 return taskController.getCompleteTasks(request, response) // выводит завершенные задачи
             case '/task/:id':
-                taskController.getOneTask(request, response) // выводит 1 задачу
-            default:
-                status = 404;
-                response.writeHead(status);
-                response.end('нет контента');
+                return taskController.getOneTask(request, response) // выводит 1 задачу
+            case '/task':
+                if (request.method === 'POST') {
+                    return taskController.addTask(request, response) // выводит все задачи
+                } else {
+
+                }
         }
-    }
-    if (request.method === 'POST') {
-        switch (request.url) {
-            case '/':
-            case '/list-total-tasks':
-                taskController.addTask(request, response) // выводит все задачи
-            default:
-                status = 404;
-                response.writeHead(status);
-                response.end('нет контента');
-        }
-        response.end('этот адрес невалиден')
+
     }
 
 }

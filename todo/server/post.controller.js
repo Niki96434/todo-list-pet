@@ -1,5 +1,6 @@
 import { validateTaskFields, validateTaskData } from "./validation.js";
 import { Task } from "./task.js";
+import { pool } from "./db.js";
 
 export default class taskController {
 
@@ -8,7 +9,7 @@ export default class taskController {
         request.on('data', (chunk) => {
             body += chunk.toString();
         });
-        request.on('end', () => {
+        request.on('end', async () => {
             try {
                 if (!body.trim()) {
                     response.writeHead(400, { 'Content-Type': 'application/json' });
@@ -20,14 +21,16 @@ export default class taskController {
                 validateTaskFields(data);
                 validateTaskData(data);
 
-                let { title, description, deadline, priority, user_id, completed } = data;
-                const task = new Task(title, description, deadline, priority, user_id, completed);
+                let { title, description, deadline, priority } = data;
 
-                response.writeHead(201, { 'Content-Type': 'application/json' });
-                response.end(JSON.stringify({
-                    success: true,
-                    task: { id: task.id, title: task.title, description: task.description }
-                }));
+                const task = await pool.query('INSERT INTO Task (title, description, deadline, priority) values ($1, $2, $3, $4) RETURNING *', [title, description, deadline, priority]);
+
+                // const newTask = new Task(title, description, deadline, priority, user_id, completed);
+                if (task && newTask) {
+                    response.writeHead(201, { 'Content-Type': 'text/html; charset=UTF-8' });
+                    // response.write(`<p>${newTask}</p>`);
+                    response.end(`<p>${task}</p>`);
+                }
 
             } catch (err) {
                 if (err.name === 'PropertyRequiredError') {
@@ -48,59 +51,40 @@ export default class taskController {
 
     }
 
-    static async getOneTask(request, response) { // GET task/:id {id: 1}
-        let body = '';
-        request.on('data', (chunk) => {
-            body += chunk.toString();
-        });
-        request.on('end', async () => {
-            try {
+    static async getOneTask(request, response) {
+        const task_url = request.url.split('/');
+        const task_id = task_url.at(-1);
 
-                if (body.trim() === '') {
-                    throw new Error('EMPTY_BODY')
-                }
+        try {
 
-                const data = JSON.parse(body);
-                if (!data.id) {
-                    throw new Error('ID_NOT_EXIST');
-                }
-
-                const { id } = data;
-
-                // id должен быть из url, а не из тела(сразу получать id должен)
-                const res = await find(id); // здесь какая-то функция с промисом, которая ищет в бд по айди задачу, и возвращает объект задачи
-
-                response.writeHead(200, { 'Content-Type': 'application/json' });
-                response.end(JSON.stringify({
-                    success: true
-                }))
-            } catch (err) {
-                if (err instanceof SyntaxError) {
-                    response.writeHead(400, { 'Content-Type': 'application/json' });
-                    response.end(JSON.stringify({
-                        error: 'неверный формат json'
-                    }))
-                }
-                if (err.name === 'EMPTY_BODY') {
-                    response.writeHead(400, { 'Content-Type': 'application/json' });
-                    response.end(JSON.stringify({
-                        error: 'пустое тело запроса'
-                    }))
-                }
-                if (err.name === 'ID_NOT_EXIST') {
-                    response.writeHead(400, { 'Content-Type': 'application/json' });
-                    response.end(JSON.stringify({
-                        error: 'задачи с таким id не найдено'
-                    }))
-                }
-                if (err) {
-                    response.writeHead(500, { 'Content-Type': 'application/json' });
-                    response.end(JSON.stringify({
-                        error: 'server error'
-                    }))
-                }
+            if (typeof task_id !== 'number') { // проверку улучшить
+                throw new Error('ID_NOT_VALID')
             }
-        })
+            const res = await find(task_id); // здесь какая-то функция с промисом, которая ищет в бд по айди задачу, и возвращает объект задачи
+
+            response.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
+            response.end(`<p>${res}</p>`);
+
+        } catch (err) {
+            if (err.name === 'ID_NOT_VALID') {
+                response.writeHead(400, { 'Content-Type': 'application/json' });
+                response.end(JSON.stringify({
+                    error: 'задачи с таким id не найдено'
+                }))
+            }
+            if (err.name === 'ID_NOT_EXIST') {
+                response.writeHead(400, { 'Content-Type': 'application/json' });
+                response.end(JSON.stringify({
+                    error: 'задачи с таким id не найдено'
+                }))
+            }
+            if (err) {
+                response.writeHead(500, { 'Content-Type': 'application/json' });
+                response.end(JSON.stringify({
+                    error: 'server error'
+                }))
+            }
+        }
     }
     static getTotalTasks(request, response) {
 

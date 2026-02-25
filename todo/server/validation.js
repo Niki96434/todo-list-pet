@@ -18,16 +18,16 @@ export class PropertyRequiredError extends ValidationError {
 // правило 1 функция - 1 задача
 // сначала проверяем, пустые ли поля, а только затем формат
 
-export function validateTaskFields({ title, description, deadline, priority, user_id, completed }) {
+export function validateTaskFields({ title, description, deadline, priority }) {
     if (title.trim() === '') throw new PropertyRequiredError("title");
     if (description.trim() === '') throw new PropertyRequiredError("description");
     if (deadline.trim() === '') throw new PropertyRequiredError("deadline");
     if (priority.trim() === '') throw new PropertyRequiredError("priority");
-    if (typeof completed == 'undefined') throw new PropertyRequiredError("completed");
-    if (!user_id) throw new PropertyRequiredError("user_id");
+    // if (typeof completed == 'undefined') throw new PropertyRequiredError("completed");
+    // if (!user_id) throw new PropertyRequiredError("user_id");
 }
 // правильно ли ввели данные для задачи
-export function validateTaskData({ title, description, deadline, priority, user_id, completed }) {
+export function validateTaskData({ title, description, deadline, priority }) {
     const TITLE_MIN_LENGTH = 3;
     const TITLE_MAX_LENGTH = 100;
     const DESCRIPTION_MAX_LENGTH = 1000;
@@ -48,10 +48,10 @@ export function validateTaskData({ title, description, deadline, priority, user_
         throw new ValidationError('Невалидный приоритет')
     }
 
-    if (typeof completed !== 'boolean') {
-        throw new ValidationError('Невалидно')
-    }
-    if (typeof user_id !== 'number') {
-        throw new ValidationError('невалидно')
-    }
+    // if (typeof completed !== 'boolean' || completed !== '') {
+    //     throw new ValidationError('Невалидно')
+    // }
+    // if (typeof user_id !== 'number') {
+    //     throw new ValidationError('невалидно')
+    // }
 }
