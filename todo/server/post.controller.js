@@ -1,6 +1,7 @@
 import { validateTaskFields, validateTaskData } from "./validation.js";
 import { Task } from "./task.js";
 import { pool } from "./db.js";
+import { RepositoryPost } from "./post.repository.js";
 
 export default class taskController {
 
@@ -24,7 +25,7 @@ export default class taskController {
 
                 let { title, description, deadline, priority } = data;
 
-                const task = await pool.query('INSERT INTO Task (title, description, deadline, priority) values ($1, $2, $3, $4) RETURNING *', [title, description, deadline, priority]);
+                const task = await RepositoryPost.addTask(title, description, deadline, priority);
 
                 const newTask = new Task(title, description, deadline, priority);
 
@@ -52,7 +53,7 @@ export default class taskController {
 
     }
 
-    static async getOneTask(request, response) {
+    static async findByIdTask(request, response) {
         const task_url = request.url.split('/');
         const task_id = task_url.at(-1);
 
@@ -61,7 +62,7 @@ export default class taskController {
             if (typeof task_id !== 'number') { // проверку улучшить
                 throw new Error('ID_NOT_VALID')
             }
-            const res = await pool.query('SELECT * FROM Task WHERE id = $1 RETURNING *', [task_id]);
+            const res = await RepositoryPost.getOneTask(task_id);
 
             const { title, description, deadline, priority } = res;
 
@@ -74,7 +75,7 @@ export default class taskController {
             if (err.name === 'ID_NOT_VALID') {
                 response.writeHead(400, { 'Content-Type': 'application/json' });
                 response.end(JSON.stringify({
-                    error: 'задачи с таким id не найдено'
+                    error: 'id '
                 }))
             }
             if (err.name === 'ID_NOT_EXIST') {
@@ -93,8 +94,19 @@ export default class taskController {
     }
 
     static async deleteTask(request, response) {
-        const res = await pool.query('DELETE FROM Task WHERE id = ?', [task_id]);
+        const task_url = request.url.split('/');
+        const task_id = task_url.at(-1);
+
+        const del = await RepositoryPost.delTask(task_id);
+
+        del.catch(err => {
+            response.writeHead(400, { 'Content-Type': 'application/json' });
+            response.end(JSON.stringify({
+                error: err
+            }));
+        })
     }
+
     static getTotalTasks(request, response) {
 
     }
