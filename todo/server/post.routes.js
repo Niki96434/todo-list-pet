@@ -11,6 +11,7 @@ export default function (request, response) {
         response.end('этот адрес невалиден')
         return;
     }
+    //
     if (request.method === 'GET') {
         switch (request.url) {
             case '/':
