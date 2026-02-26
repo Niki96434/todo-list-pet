@@ -62,7 +62,7 @@ export default class taskController {
         const task_id = task_url.at(-1);
 
         try {
-            # TODO: huesosi rabotaite
+            # TODO: huesosi rabotaitee
             if (typeof task_id !== 'number') {
                 throw new Error('ID_NOT_VALID')
             }
