@@ -43,6 +43,9 @@ export default function (request, response) {
         response.writeHead(400, { 'Content-Type': 'text/html; charset=utf-8' });
         response.end('нет контента')
     }
+
+    // TODO: сделать проверку на поток при запросе
+
 }
 
 

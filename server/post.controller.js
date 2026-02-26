@@ -123,4 +123,6 @@ export default class taskController {
     static getCompleteTasks(request, response) {
         // TODO: доделать метод на получение выполненных задач
     }
+
+    // TODO: валидацию везде прочекать и санитайзинг!важно!
 }
