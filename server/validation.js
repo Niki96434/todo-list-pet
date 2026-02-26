@@ -1,4 +1,6 @@
 import { Task } from './task.js'
+
+// TODO: 
 class MyError extends Error {
     constructor(message) {
         super(message);
@@ -54,4 +56,12 @@ export function validateTaskData({ title, description, deadline, priority }) {
     // if (typeof user_id !== 'number') {
     //     throw new ValidationError('невалидно')
     // }
+}
+
+export class DbError extends MyError {
+    constructor(message) {
+        super(message);
+        this.message = message;
+        this.name = 'DbError';
+    }
 }

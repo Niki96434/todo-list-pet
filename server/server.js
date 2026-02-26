@@ -1,9 +1,11 @@
 import * as http from 'node:http';
 import { loadEnvFile } from 'node:process';
-import handleRequest from './post.routes.js';
+import handleRequest from './task.routes.js';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { pool } from './db.js';
+import { RepositoryTask } from './task.repository.js';
+import taskController from './task.controller.js';
 
 
 try {
@@ -38,6 +40,8 @@ async function checkConnectDB() {
 }
 
 checkConnectDB();
+
+taskController.initRepository(RepositoryTask);
 
 server.listen(PORT, HOST, function onServerStatus() {
     console.log(`Сервер запущен на порту http://${HOST}:${PORT}`);

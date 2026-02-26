@@ -1,13 +1,18 @@
-import { validateTaskFields, validateTaskData } from "./validation.js";
+import { validateTaskFields, validateTaskData, DbError } from "./validation.js";
 import { Task } from "./task.js";
 import { pool } from "./db.js";
-import { RepositoryPost } from "./post.repository.js";
 
 export default class taskController {
 
-    constructor(RepositoryPost) {
-        this.repository = RepositoryPost;
+    static repository = null;
+
+    static initRepository(repo) {
+        this.repository = repo;
     }
+
+    // constructor(repository) {
+    //     this.repository = repository;
+    // }
 
     static addTask(request, response) {
         let body = '';
@@ -48,6 +53,9 @@ export default class taskController {
                 } else if (err instanceof SyntaxError) {
                     response.writeHead(400, { 'Content-Type': 'application/json' });
                     response.end(JSON.stringify({ error: 'Неверный формат JSON' }));
+                } else if (err instanceof DbError) {
+                    response.writeHead(400, { 'Content-Type': 'application/json' });
+                    response.end(JSON.stringify({ error: 'Ошибка с БД' }));
                 } else {
                     response.writeHead(500, { 'Content-Type': 'application/json' });
                     response.end(JSON.stringify({ error: 'Internal server error' }));
@@ -58,6 +66,7 @@ export default class taskController {
     }
 
     static async findByIdTask(request, response) {
+
         const task_url = request.url.split('/');
         const task_id = task_url.at(-1);
 
@@ -81,7 +90,7 @@ export default class taskController {
             if (err.name === 'ID_NOT_VALID') {
                 response.writeHead(400, { 'Content-Type': 'application/json' });
                 response.end(JSON.stringify({
-                    error: 'id '
+                    error: 'id невалидный'
                 }))
             }
             if (err.name === 'ID_NOT_EXIST') {
@@ -100,17 +109,43 @@ export default class taskController {
     }
 
     static async deleteTask(request, response) {
-        const task_url = request.url.split('/');
-        const task_id = task_url.at(-1);
+        try {
+            // TODO: сделать проверку на существование задачи
+            const task_url = request.url.split('/');
+            console.log(task_url);
+            const task_id = task_url.at(-1);
+            if (isNaN(parseInt(task_id)) || parseInt(task_id) <= 0) {
+                response.writeHead(400, { 'Content-Type': 'application/json' });
+                response.end(JSON.stringify({
+                    error: 'id невалиден'
+                }));
+                return;
+            }
+            const res = await this.repository.delTask(task_id);
 
-        const del = await this.repository.delTask(task_id);
-
-        del.catch(err => {
-            response.writeHead(400, { 'Content-Type': 'application/json' });
+            response.writeHead(200, { 'Content-Type': 'application/json' });
             response.end(JSON.stringify({
-                error: err
-            }));
-        })
+                success: true
+            }))
+        } catch (err) {
+            // TODO: вынести в функцию обработку ошибок
+            if (err.name === 'TypeError') {
+                response.writeHead(400, { 'Content-Type': 'application/json' });
+                response.end(JSON.stringify({
+                    error: err.message
+                }))
+            } else if (err.name === 'DbError') {
+                response.writeHead(400, { 'Content-Type': 'application/json' });
+                response.end(JSON.stringify({
+                    error: err.message
+                }))
+            } else {
+                response.writeHead(500, { 'Content-Type': 'application/json' });
+                response.end(JSON.stringify({
+                    error: err.message
+                }))
+            }
+        }
     }
 
     static getTotalTasks(request, response) {
