@@ -62,11 +62,12 @@ export default class taskController {
         const task_id = task_url.at(-1);
 
         try {
-            // TODO: сделать проверку на числа
+            // TODO: сделать проверку на числаа
             if (typeof task_id !== 'number') {
                 throw new Error('ID_NOT_VALID')
             }
-            // TODO: поиск по айди работает не так как надо
+
+            // TODO: поиск по айди работает не тааак как надо
             const res = await this.repository.findByID(task_id);
 
             const { title, description, deadline, priority } = res;
