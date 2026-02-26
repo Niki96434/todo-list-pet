@@ -18,7 +18,7 @@ export class RepositoryTask {
 
     static async delTask(id) {
         try {
-            // TODO: очень настойчиво говорит об ошибке типа id
+
             let result = await pool.query('DELETE FROM Task WHERE id = $1', [id]);
             console.log(result);
             if (result.rowCount === 0) {
