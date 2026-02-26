@@ -62,10 +62,11 @@ export default class taskController {
         const task_id = task_url.at(-1);
 
         try {
-            // TODO: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+            // TODO: сделать проверку на числа
             if (typeof task_id !== 'number') {
                 throw new Error('ID_NOT_VALID')
             }
+            // TODO: поиск по айди работает не так как надо
             const res = await this.repository.findByID(task_id);
 
             const { title, description, deadline, priority } = res;
@@ -112,13 +113,13 @@ export default class taskController {
     }
 
     static getTotalTasks(request, response) {
-        // TODO: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        // TODO: доделать метод на получение всех задач
     }
     static getIncompleteTasks(request, response) {
-
+        // TODO: доделать метод на получение невыполненных задач
     }
 
     static getCompleteTasks(request, response) {
-
+        // TODO: доделать метод на получение выполненных задач
     }
 }
