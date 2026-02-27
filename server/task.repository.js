@@ -5,9 +5,14 @@ import { DbError } from "./validation.js";
 export class RepositoryTask {
 
     static async addTask(title, description, deadline, priority) {
-        let result = await pool.query('INSERT INTO Task (title, description, deadline, priority) values ($1, $2, $3, $4) RETURNING *', [title, description, deadline, priority]);
-        if (!result) throw new DbError('addTask', err);
-        return result
+        try {
+
+            let result = await pool.query('INSERT INTO Task (title, description, deadline, priority) values ($1, $2, $3, $4) RETURNING *', [title, description, deadline, priority]);
+            return result
+
+        } catch (err) {
+            throw new DbError('addTask', err);
+        }
 
     }
 

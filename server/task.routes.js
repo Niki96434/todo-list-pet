@@ -29,8 +29,11 @@ export default function (request, response) {
     } else if (request.method === 'POST') {
         switch (request.url) {
             case '/':
-            case '/api/create-task/':
-                return taskController.addTask(request, response)
+            default:
+                if (request.url.startsWith('/api/create-task/')) {
+                    return taskController.addTask(request, response)
+                }
+
         }
     } else if (request.method === 'DELETE') {
         if (request.url.startsWith('/api/delete-task/')) {

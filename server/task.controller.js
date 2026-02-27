@@ -60,7 +60,12 @@ export default class TaskController {
             const { title, description, deadline, priority } = res;
 
             sendSuccess(response, 200, title);
-            return true;
+            return {
+                title: title,
+                description: description,
+                deadline: deadline,
+                priority: priority
+            };
 
         } catch (err) {
             handlerError(response, ValidationError, err);
@@ -75,12 +80,15 @@ export default class TaskController {
 
             checkEmptyID(task_id);
             checkInvalidID(task_id);
-            // TODO: дописать проверку на существование id
-            if (!this.repository.getByIdTask(task_id)) {
+
+            const checkExistingTask = await this.repository.getByIdTask(task_id);
+
+            if (!checkExistingTask) {
                 throw new NotFoundIDError(task_id)
             }
+            const res = await this.repository.deleteTask(task_id);
             sendSuccess(response, 200);
-            return;
+            return res;
 
         } catch (err) {
             handlerError(response, TypeError, err);

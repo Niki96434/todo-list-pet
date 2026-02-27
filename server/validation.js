@@ -5,7 +5,7 @@ class AppError extends Error {
     }
 }
 
-export class ReadError extends AppError { }
+export class ClientError extends AppError { }
 
 export class DbError extends AppError {
     constructor(message, cause) {
@@ -13,16 +13,16 @@ export class DbError extends AppError {
         this.cause = cause;
     }
 }
-export class ValidationError extends ReadError { }
+export class ValidationError extends ClientError { }
 
-export class ClientError extends AppError { }
+export class NotFoundError extends ClientError { }
 
-export class NotFoundIDError extends ClientError {
+export class NotFoundIDError extends NotFoundError {
     constructor(id) {
         super(id + ' не найдено');
     }
 }
-export class EmptyBodyRequestError extends ClientError {
+export class EmptyBodyRequestError extends NotFoundError {
     constructor(message) {
         super(message);
         this.message = 'пустое тело запроса';
@@ -50,7 +50,7 @@ export class InvalidIDError extends ValidationError {
 }
 
 export function checkEmptyID(id) {
-    if (id.trim() === '') {
+    if (id === '') {
         throw new InvalidIDError('пустая строка')
     }
     return true;
