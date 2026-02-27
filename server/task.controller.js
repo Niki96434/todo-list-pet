@@ -10,10 +10,6 @@ export default class taskController {
         this.repository = repo;
     }
 
-    // constructor(repository) {
-    //     this.repository = repository;
-    // }
-
     static addTask(request, response) {
         let body = '';
         request.on('data', (chunk) => {
@@ -67,22 +63,22 @@ export default class taskController {
 
     static async findByIdTask(request, response) {
 
-        const task_url = request.url.split('/');
-        const task_id = task_url.at(-1);
-
         try {
-            // TODO: сделать проверку на числаа
-            if (typeof task_id !== 'number') {
+            const task_url = request.url.split('/');
+            console.log(task_url);
+            const task_id = task_url.at(-1);
+
+
+            if (isNaN(parseInt(task_id)) || parseInt(task_id) <= 0) {
                 throw new Error('ID_NOT_VALID')
             }
-
-            // TODO: поиск по айди работает не тааак как надо
+            // TODO: не ищет в бд по айди
             const res = await this.repository.findByID(task_id);
-
+            console.log(res);
             const { title, description, deadline, priority } = res;
 
             const task = new Task(title, description, deadline, priority);
-
+            console.log(task);
             response.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
             response.end(`<p>${task.title}</p>`);
 
@@ -93,7 +89,7 @@ export default class taskController {
                     error: 'id невалидный'
                 }))
             }
-            if (err.name === 'ID_NOT_EXIST') {
+            if (err.message === 'ID_NOT_EXIST') {
                 response.writeHead(400, { 'Content-Type': 'application/json' });
                 response.end(JSON.stringify({
                     error: 'задачи с таким id не найдено'
@@ -110,10 +106,10 @@ export default class taskController {
 
     static async deleteTask(request, response) {
         try {
-            // TODO: сделать проверку на существование задачи
+            // TODO: сделать проверку на существование задачи с помощью findByIdTask
             const task_url = request.url.split('/');
-            console.log(task_url);
             const task_id = task_url.at(-1);
+
             if (isNaN(parseInt(task_id)) || parseInt(task_id) <= 0) {
                 response.writeHead(400, { 'Content-Type': 'application/json' });
                 response.end(JSON.stringify({

@@ -12,21 +12,23 @@ export class RepositoryTask {
     }
 
     static async findByIdTask(id) {
-        let result = pool.query('SELECT * FROM Task WHERE id = $1 RETURNING *', [task_id]);
-        return result
+        try {
+            let result = await pool.query('SELECT * FROM Task WHERE id = $1 RETURNING *', [id]);
+            if (result.rowCount === 0) {
+                throw new Error('ID_NOT_EXIST')
+            }
+            return result
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     static async delTask(id) {
-        try {
 
-            let result = await pool.query('DELETE FROM Task WHERE id = $1', [id]);
-            console.log(result);
-            if (result.rowCount === 0) {
-                throw new DbError('задача с таким id не найдена')
-            }
+        let result = await pool.query('DELETE FROM Task WHERE id = $1', [id]);
 
-        } catch (e) {
-            throw new DbError(`ошибка с операцией бд на удаление задачи ${id}`);
+        if (result.rowCount === 0) {
+            throw new DbError('задача с таким id не найдена')
         }
     }
 

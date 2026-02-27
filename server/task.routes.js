@@ -21,13 +21,15 @@ export default function (request, response) {
                 return taskController.getIncompleteTasks(request, response) // выводит незавершенные задачи
             case '/list-completed-tasks':
                 return taskController.getCompleteTasks(request, response) // выводит завершенные задачи
-            case '/task/:id':
-                return taskController.getOneTask(request, response) // выводит 1 задачу
+            default:
+                if (request.url.startsWith('/api/find-task/')) {
+                    return taskController.findByIdTask(request, response)
+                }
         }
     } else if (request.method === 'POST') {
         switch (request.url) {
             case '/':
-            case '/task/create':
+            case '/api/create-task/':
                 return taskController.addTask(request, response)
         }
     } else if (request.method === 'DELETE') {
