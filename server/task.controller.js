@@ -1,7 +1,7 @@
-import { validateTaskFields, validateTaskData, DbError, ValidationError, checkInvalidID } from "./validation.js";
+import { validateTaskFields, validateTaskData, DbError, ValidationError, checkInvalidID, checkEmptyID, handlerError } from "./validation.js";
 import { Task } from "./task.js";
 
-export default class taskController {
+export default class TaskController {
 
     static repository = null;
 
@@ -38,68 +38,54 @@ export default class taskController {
                 return task;
 
             } catch (err) {
-                if (err instanceof ValidationError) {
-                    response.writeHead(400, { 'Content-Type': 'application/json' });
-                    response.end(JSON.stringify({ error: err.message }));
-                } else if (err instanceof SyntaxError) {
+                if (err instanceof SyntaxError) {
                     response.writeHead(400, { 'Content-Type': 'application/json' });
                     response.end(JSON.stringify({ error: 'Неверный формат JSON' }));
-                } else if (err instanceof DbError) {
-                    response.writeHead(400, { 'Content-Type': 'application/json' });
-                    response.end(JSON.stringify({ error: 'Ошибка с БД' }));
                 } else {
-                    response.writeHead(500, { 'Content-Type': 'application/json' });
-                    response.end(JSON.stringify({ error: 'Internal server error' }));
+                    // TODO: неправильно обрабатываю единым обработчиком ошибок(аля мидлвары в экспресс)
+                    handlerError(ValidationError, err);
+                    handlerError(DbError, err);
                 }
             }
         });
 
     }
 
-    static async findByIdTask(request, response) {
+    static async getByIdTask(request, response) {
 
         try {
             const task_url = request.url.split('/');
             console.log(task_url);
             const task_id = parseInt(task_url.at(-1));
 
-            // TODO: добавить проверку на пустую строку
+            checkEmptyID(task_id);
             checkInvalidID(task_id);
 
-            // TODO: не ищет в бд по айди
-            const res = await this.repository.findByID(task_id);
+            const res = await this.repository.getByIdTask(task_id);
 
             const { title, description, deadline, priority } = res;
 
-            const task = new Task(title, description, deadline, priority);
-            console.log(task);
             response.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
-            response.end(`<p>${task.title}</p>`);
+            response.end(`<p>${title}</p>`);
+            return res;
 
         } catch (err) {
-            if (err instanceof ValidationError) {
-                response.writeHead(400, { 'Content-Type': 'application/json' });
-                response.end(JSON.stringify({
-                    error: err.message
-                }))
-            } else {
-                response.writeHead(500, { 'Content-Type': 'application/json' });
-                response.end(JSON.stringify({
-                    error: 'server error'
-                }))
-            }
+            handlerError(ValidationError, err);
+            handlerError(DbError, err);
         }
     }
 
     static async deleteTask(request, response) {
         try {
-            // TODO: сделать проверку на существование задачи с помощью findByIdTask
             const task_url = request.url.split('/');
             const task_id = parseInt(task_url.at(-1));
 
+            checkEmptyID(task_id);
             checkInvalidID(task_id);
 
-            const res = await this.repository.delTask(task_id);
+            if (!this.repository.getByIdTask(task_id)) {
+                throw new Error()
+            }
 
             response.writeHead(200, { 'Content-Type': 'application/json' });
             response.end(JSON.stringify({
@@ -107,23 +93,9 @@ export default class taskController {
             }))
             return res;
         } catch (err) {
-            // TODO: вынести в функцию обработку ошибок
-            if (err instanceof TypeError) {
-                response.writeHead(400, { 'Content-Type': 'application/json' });
-                response.end(JSON.stringify({
-                    error: err.message
-                }))
-            } else if (err instanceof DbError) {
-                response.writeHead(400, { 'Content-Type': 'application/json' });
-                response.end(JSON.stringify({
-                    error: err.message
-                }))
-            } else {
-                response.writeHead(500, { 'Content-Type': 'application/json' });
-                response.end(JSON.stringify({
-                    error: err.message
-                }))
-            }
+            handlerError(TypeError, err);
+            handlerError(ValidationError, err);
+            handlerError(DbError, err);
         }
     }
 

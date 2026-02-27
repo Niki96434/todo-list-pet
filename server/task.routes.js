@@ -23,7 +23,7 @@ export default function (request, response) {
                 return taskController.getCompleteTasks(request, response) // выводит завершенные задачи
             default:
                 if (request.url.startsWith('/api/find-task/')) {
-                    return taskController.findByIdTask(request, response)
+                    return taskController.getByIdTask(request, response)
                 }
         }
     } else if (request.method === 'POST') {

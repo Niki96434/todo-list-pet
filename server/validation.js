@@ -1,6 +1,3 @@
-import { Task } from './task.js'
-
-// TODO: 
 class MyError extends Error {
     constructor(message) {
         super(message);
@@ -11,9 +8,9 @@ class MyError extends Error {
 export class ValidationError extends MyError { }
 
 export class DbError extends MyError {
-    constructor(message) {
-        super(message);
-        this.message = message;
+    constructor(message, cause) {
+        super('ошибка операции бд: ' + message);
+        this.cause = cause;
     }
 }
 
@@ -31,10 +28,13 @@ export class InvalidDataError extends ValidationError {
 }
 
 export class InvalidIDError extends ValidationError {
-    constructor(message) {
-        super('невалидно id с номером: ' + message);
+    constructor(id) {
+        super('невалидный id : ' + id);
+        this.id = id;
     }
 }
+
+
 
 class ReadError extends Error {
     // TODO: дописать высокоуровневую ошибку для чтения джейсон
@@ -47,12 +47,24 @@ export function checkInvalidID(id) {
 }
 
 export function checkEmptyID(id) { // ''
-    if (id === '') {
-
+    if (id.trim() === '') {
+        throw new InvalidIDError('пустая строка')
     }
 }
 
-
+export function handlerError(ErrorName, err) {
+    if (err instanceof ErrorName) {
+        response.writeHead(400, { 'Content-Type': 'application/json' });
+        response.end(JSON.stringify({
+            error: err.message
+        }))
+    } else {
+        response.writeHead(500, { 'Content-Type': 'application/json' });
+        response.end(JSON.stringify({
+            error: 'server error'
+        }))
+    }
+}
 // правило 1 функция - 1 задача
 // сначала проверяем, пустые ли поля, а только затем формат
 
