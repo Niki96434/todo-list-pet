@@ -1,19 +1,34 @@
-class MyError extends Error {
+class AppError extends Error {
     constructor(message) {
         super(message);
         this.name = this.constructor.name;
     }
 }
 
-export class ValidationError extends MyError { }
+export class ReadError extends AppError { }
 
-export class DbError extends MyError {
+export class DbError extends AppError {
     constructor(message, cause) {
         super('ошибка операции бд: ' + message);
         this.cause = cause;
     }
 }
+export class ValidationError extends ReadError { }
 
+export class ClientError extends AppError { }
+
+export class NotFoundIDError extends ClientError {
+    constructor(id) {
+        super(id + ' не найдено');
+    }
+}
+export class EmptyBodyRequestError extends ClientError {
+    constructor(message) {
+        super(message);
+        this.message = 'пустое тело запроса';
+    }
+
+}
 export class EmptyFieldError extends ValidationError {
     constructor(property) {
         super('Отстутствует поле: ' + property);
@@ -29,44 +44,27 @@ export class InvalidDataError extends ValidationError {
 
 export class InvalidIDError extends ValidationError {
     constructor(id) {
-        super('невалидный id : ' + id);
+        super('id имеет неверный формат: ' + id);
         this.id = id;
     }
 }
 
-
-
-class ReadError extends Error {
-    // TODO: дописать высокоуровневую ошибку для чтения джейсон
+export function checkEmptyID(id) {
+    if (id.trim() === '') {
+        throw new InvalidIDError('пустая строка')
+    }
+    return true;
 }
 
 export function checkInvalidID(id) {
     if (isNaN(id) || id <= 0) {
         throw new InvalidIDError(id)
     }
+    return true;
 }
 
-export function checkEmptyID(id) { // ''
-    if (id.trim() === '') {
-        throw new InvalidIDError('пустая строка')
-    }
-}
 
-export function handlerError(ErrorName, err) {
-    if (err instanceof ErrorName) {
-        response.writeHead(400, { 'Content-Type': 'application/json' });
-        response.end(JSON.stringify({
-            error: err.message
-        }))
-    } else {
-        response.writeHead(500, { 'Content-Type': 'application/json' });
-        response.end(JSON.stringify({
-            error: 'server error'
-        }))
-    }
-}
 // правило 1 функция - 1 задача
-// сначала проверяем, пустые ли поля, а только затем формат
 
 export function validateTaskFields({ title, description, deadline, priority }) {
     if (title.trim() === '') throw new EmptyFieldError("title");
@@ -76,7 +74,7 @@ export function validateTaskFields({ title, description, deadline, priority }) {
     // if (typeof completed == 'undefined') throw new EmptyFieldError("completed");
     // if (!user_id) throw new EmptyFieldError("user_id");
 }
-// правильно ли ввели данные для задачи
+
 export function validateTaskData({ title, description, deadline, priority }) {
     const TITLE_MIN_LENGTH = 3;
     const TITLE_MAX_LENGTH = 100;

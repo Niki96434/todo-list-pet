@@ -1,5 +1,6 @@
-import { validateTaskFields, validateTaskData, DbError, ValidationError, checkInvalidID, checkEmptyID, handlerError } from "./validation.js";
+import { validateTaskFields, validateTaskData, DbError, ValidationError, checkInvalidID, checkEmptyID, NotFoundIDError, EmptyBodyRequestError } from "./validation.js";
 import { Task } from "./task.js";
+import { sendSuccess, handlerError } from "./middleware.task.js";
 
 export default class TaskController {
 
@@ -17,8 +18,7 @@ export default class TaskController {
         request.on('end', async () => {
             try {
                 if (!body.trim()) {
-                    response.writeHead(400, { 'Content-Type': 'application/json' });
-                    response.end(JSON.stringify({ error: 'пустое тело запроса' }));
+                    handlerError(response, EmptyBodyRequestError, new EmptyBodyRequestError)
                     return;
                 }
 
@@ -33,19 +33,13 @@ export default class TaskController {
 
                 const newTask = new Task(title, description, deadline, priority);
 
-                response.writeHead(201, { 'Content-Type': 'text/html; charset=UTF-8' });
-                response.end(`<p>${newTask.title}</p>`);
+                sendSuccess(response, 200, newTask.title);
                 return task;
 
             } catch (err) {
-                if (err instanceof SyntaxError) {
-                    response.writeHead(400, { 'Content-Type': 'application/json' });
-                    response.end(JSON.stringify({ error: 'Неверный формат JSON' }));
-                } else {
-                    // TODO: неправильно обрабатываю единым обработчиком ошибок(аля мидлвары в экспресс)
-                    handlerError(ValidationError, err);
-                    handlerError(DbError, err);
-                }
+                handlerError(response, SyntaxError, err);
+                handlerError(response, ValidationError, err);
+                handlerError(response, DbError, err);
             }
         });
 
@@ -65,13 +59,12 @@ export default class TaskController {
 
             const { title, description, deadline, priority } = res;
 
-            response.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
-            response.end(`<p>${title}</p>`);
-            return res;
+            sendSuccess(response, 200, title);
+            return true;
 
         } catch (err) {
-            handlerError(ValidationError, err);
-            handlerError(DbError, err);
+            handlerError(response, ValidationError, err);
+            handlerError(response, DbError, err);
         }
     }
 
@@ -82,20 +75,18 @@ export default class TaskController {
 
             checkEmptyID(task_id);
             checkInvalidID(task_id);
-
+            // TODO: дописать проверку на существование id
             if (!this.repository.getByIdTask(task_id)) {
-                throw new Error()
+                throw new NotFoundIDError(task_id)
             }
+            sendSuccess(response, 200);
+            return;
 
-            response.writeHead(200, { 'Content-Type': 'application/json' });
-            response.end(JSON.stringify({
-                success: true
-            }))
-            return res;
         } catch (err) {
-            handlerError(TypeError, err);
-            handlerError(ValidationError, err);
-            handlerError(DbError, err);
+            handlerError(response, TypeError, err);
+            handlerError(response, ValidationError, err);
+            handlerError(response, DbError, err);
+            handlerError(response, NotFoundIDError, err)
         }
     }
 

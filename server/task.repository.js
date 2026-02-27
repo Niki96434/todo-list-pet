@@ -26,7 +26,6 @@ export class RepositoryTask {
             return result
         } catch (err) {
             throw new DbError('deleteTask', err)
-
         }
     }
 
