@@ -1,6 +1,5 @@
-import { validateTaskFields, validateTaskData, DbError } from "./validation.js";
+import { validateTaskFields, validateTaskData, DbError, ValidationError, checkInvalidID } from "./validation.js";
 import { Task } from "./task.js";
-import { pool } from "./db.js";
 
 export default class taskController {
 
@@ -30,22 +29,18 @@ export default class taskController {
 
                 let { title, description, deadline, priority } = data;
 
-                const task = await RepositoryPost.addTask(title, description, deadline, priority);
+                const task = await this.repository.addTask(title, description, deadline, priority);
 
                 const newTask = new Task(title, description, deadline, priority);
 
-                if (task && newTask) {
-                    response.writeHead(201, { 'Content-Type': 'text/html; charset=UTF-8' });
-                    response.end(`<p>${newTask.title}</p>`);
-                }
+                response.writeHead(201, { 'Content-Type': 'text/html; charset=UTF-8' });
+                response.end(`<p>${newTask.title}</p>`);
+                return task;
 
             } catch (err) {
-                if (err.name === 'PropertyRequiredError') {
+                if (err instanceof ValidationError) {
                     response.writeHead(400, { 'Content-Type': 'application/json' });
-                    response.end(JSON.stringify({ error: 'Не должно быть пустых полей.' }));
-                } else if (err.name === 'ValidationError') {
-                    response.writeHead(400, { 'Content-Type': 'application/json' });
-                    response.end(JSON.stringify({ error: 'Ошибка валидации данных' }));
+                    response.end(JSON.stringify({ error: err.message }));
                 } else if (err instanceof SyntaxError) {
                     response.writeHead(400, { 'Content-Type': 'application/json' });
                     response.end(JSON.stringify({ error: 'Неверный формат JSON' }));
@@ -66,15 +61,14 @@ export default class taskController {
         try {
             const task_url = request.url.split('/');
             console.log(task_url);
-            const task_id = task_url.at(-1);
+            const task_id = parseInt(task_url.at(-1));
 
+            // TODO: добавить проверку на пустую строку
+            checkInvalidID(task_id);
 
-            if (isNaN(parseInt(task_id)) || parseInt(task_id) <= 0) {
-                throw new Error('ID_NOT_VALID')
-            }
             // TODO: не ищет в бд по айди
             const res = await this.repository.findByID(task_id);
-            console.log(res);
+
             const { title, description, deadline, priority } = res;
 
             const task = new Task(title, description, deadline, priority);
@@ -83,19 +77,12 @@ export default class taskController {
             response.end(`<p>${task.title}</p>`);
 
         } catch (err) {
-            if (err.name === 'ID_NOT_VALID') {
+            if (err instanceof ValidationError) {
                 response.writeHead(400, { 'Content-Type': 'application/json' });
                 response.end(JSON.stringify({
-                    error: 'id невалидный'
+                    error: err.message
                 }))
-            }
-            if (err.message === 'ID_NOT_EXIST') {
-                response.writeHead(400, { 'Content-Type': 'application/json' });
-                response.end(JSON.stringify({
-                    error: 'задачи с таким id не найдено'
-                }))
-            }
-            if (err) {
+            } else {
                 response.writeHead(500, { 'Content-Type': 'application/json' });
                 response.end(JSON.stringify({
                     error: 'server error'
@@ -108,29 +95,25 @@ export default class taskController {
         try {
             // TODO: сделать проверку на существование задачи с помощью findByIdTask
             const task_url = request.url.split('/');
-            const task_id = task_url.at(-1);
+            const task_id = parseInt(task_url.at(-1));
 
-            if (isNaN(parseInt(task_id)) || parseInt(task_id) <= 0) {
-                response.writeHead(400, { 'Content-Type': 'application/json' });
-                response.end(JSON.stringify({
-                    error: 'id невалиден'
-                }));
-                return;
-            }
+            checkInvalidID(task_id);
+
             const res = await this.repository.delTask(task_id);
 
             response.writeHead(200, { 'Content-Type': 'application/json' });
             response.end(JSON.stringify({
                 success: true
             }))
+            return res;
         } catch (err) {
             // TODO: вынести в функцию обработку ошибок
-            if (err.name === 'TypeError') {
+            if (err instanceof TypeError) {
                 response.writeHead(400, { 'Content-Type': 'application/json' });
                 response.end(JSON.stringify({
                     error: err.message
                 }))
-            } else if (err.name === 'DbError') {
+            } else if (err instanceof DbError) {
                 response.writeHead(400, { 'Content-Type': 'application/json' });
                 response.end(JSON.stringify({
                     error: err.message

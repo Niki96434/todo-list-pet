@@ -14,9 +14,6 @@ export class RepositoryTask {
     static async findByIdTask(id) {
         try {
             let result = await pool.query('SELECT * FROM Task WHERE id = $1 RETURNING *', [id]);
-            if (result.rowCount === 0) {
-                throw new Error('ID_NOT_EXIST')
-            }
             return result
         } catch (err) {
             console.log(err)
