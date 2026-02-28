@@ -38,10 +38,16 @@ export default function (request, response) {
     } else if (request.method === 'DELETE') {
         if (request.url.startsWith('/api/delete-task/')) {
             return taskController.deleteTask(request, response);
+        } else {
+            response.writeHead(400, { 'Content-Type': 'text/html; charset=utf-8' });
+            response.end('нет контента');
+            return;
         }
+
     } else {
         response.writeHead(400, { 'Content-Type': 'text/html; charset=utf-8' });
         response.end('нет контента')
+        return;
     }
 
     // TODO: сделать проверку на поток при запросе

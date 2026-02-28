@@ -1,6 +1,6 @@
 import { validateTaskFields, validateTaskData, DbError, ValidationError, checkInvalidID, checkEmptyID, NotFoundIDError, EmptyBodyRequestError } from "./validation.js";
 import { Task } from "./task.js";
-import { sendSuccess, handlerError, sendError } from "./middleware.task.js";
+import { sendSuccess, handlerError, sendError, sendSuccessForAllTasks } from "./middleware.task.js";
 
 export default class TaskController {
 
@@ -40,7 +40,7 @@ export default class TaskController {
                 handlerError(response, SyntaxError, err);
                 handlerError(response, ValidationError, err);
                 handlerError(response, DbError, err);
-                handlerError(response, err, err);
+                sendError(response, 400, err);
             }
         });
 
@@ -50,7 +50,6 @@ export default class TaskController {
 
         try {
             const task_url = request.url.split('/');
-            console.log(task_url);
             const task_id = Number(task_url.at(-1));
 
             checkEmptyID(task_id);
@@ -58,9 +57,12 @@ export default class TaskController {
 
             const res = await this.repository.getByIdTask(task_id);
 
-            const { title, description, deadline, priority } = res;
+            if (!res.rows[0]) throw new NotFoundIDError(id);
+
+            const { title, description, deadline, priority } = res.rows[0];
 
             sendSuccess(response, 200, title);
+
             return {
                 title: title,
                 description: description,
@@ -69,11 +71,10 @@ export default class TaskController {
             };
 
         } catch (err) {
-            // TODO: все еще нет проверки на существование айди(
             handlerError(response, NotFoundIDError, err);
             handlerError(response, ValidationError, err);
             handlerError(response, DbError, err);
-            handlerError(response, err, err);
+            sendError(response, 400, err);
         }
     }
 
@@ -87,26 +88,28 @@ export default class TaskController {
 
             const checkExistingTask = await this.repository.getByIdTask(task_id);
 
-            if (!checkExistingTask) {
-                throw new NotFoundIDError(task_id)
+            if (!checkExistingTask.rows[0]) {
+                throw new NotFoundIDError(task_id);
+            } else {
+                const res = await this.repository.deleteTask(task_id);
+                sendSuccess(response, 200);
+                return res;
             }
-            const res = await this.repository.deleteTask(task_id);
-            sendSuccess(response, 200);
-            return res;
 
         } catch (err) {
+            // TODO: ошибка идемпотентности в запросе delete
             handlerError(response, TypeError, err);
             handlerError(response, ValidationError, err);
             handlerError(response, DbError, err);
             handlerError(response, NotFoundIDError, err);
-            handlerError(response, err, err);
+            sendError(response, 400, err);
         }
     }
 
     static async getTotalTasks(request, response) {
         try {
             const tasks = await this.repository.getTotalTasks();
-            sendSuccess(response, 200, tasks);
+            sendSuccessForAllTasks(response, 200, tasks);
             return tasks.rows
         } catch (err) {
             sendError(response, 400, err);

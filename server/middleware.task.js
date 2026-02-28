@@ -8,6 +8,13 @@ export function sendSuccess(response, status, result = true) {
     response.writeHead(status, { 'Content-Type': 'application/json' });
     response.end(JSON.stringify({
         success: true,
+        result: result
+    }));
+}
+export function sendSuccessForAllTasks(response, status, result = true) {
+    response.writeHead(status, { 'Content-Type': 'application/json' });
+    response.end(JSON.stringify({
+        success: true,
         result: result.rows
     }));
 }

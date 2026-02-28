@@ -1,6 +1,6 @@
 
 import { pool } from "./db.js";
-import { DbError } from "./validation.js";
+import { DbError, NotFoundIDError } from "./validation.js";
 
 export class RepositoryTask {
 
@@ -18,12 +18,10 @@ export class RepositoryTask {
 
     static async getByIdTask(id) {
         try {
-
             let result = await pool.query('SELECT * FROM Task WHERE id = $1', [id]);
-            return result.rows[0];
-
+            return result
         } catch (err) {
-            throw new DbError('getById', err)
+            throw new DbError('getByIdTask', err);
         }
     }
 
