@@ -22,7 +22,7 @@ export default function (request, response) {
             case '/list-completed-tasks':
                 return taskController.getCompleteTasks(request, response) // выводит завершенные задачи
             default:
-                if (request.url.startsWith('/api/find-task/')) {
+                if (request.url.startsWith('/api/get-task/')) {
                     return taskController.getByIdTask(request, response)
                 }
         }

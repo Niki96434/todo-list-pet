@@ -1,6 +1,6 @@
 import { validateTaskFields, validateTaskData, DbError, ValidationError, checkInvalidID, checkEmptyID, NotFoundIDError, EmptyBodyRequestError } from "./validation.js";
 import { Task } from "./task.js";
-import { sendSuccess, handlerError } from "./middleware.task.js";
+import { sendSuccess, handlerError, sendError } from "./middleware.task.js";
 
 export default class TaskController {
 
@@ -40,6 +40,7 @@ export default class TaskController {
                 handlerError(response, SyntaxError, err);
                 handlerError(response, ValidationError, err);
                 handlerError(response, DbError, err);
+                handlerError(response, err, err);
             }
         });
 
@@ -50,7 +51,7 @@ export default class TaskController {
         try {
             const task_url = request.url.split('/');
             console.log(task_url);
-            const task_id = parseInt(task_url.at(-1));
+            const task_id = Number(task_url.at(-1));
 
             checkEmptyID(task_id);
             checkInvalidID(task_id);
@@ -68,8 +69,11 @@ export default class TaskController {
             };
 
         } catch (err) {
+            // TODO: все еще нет проверки на существование айди(
+            handlerError(response, NotFoundIDError, err);
             handlerError(response, ValidationError, err);
             handlerError(response, DbError, err);
+            handlerError(response, err, err);
         }
     }
 
@@ -94,12 +98,19 @@ export default class TaskController {
             handlerError(response, TypeError, err);
             handlerError(response, ValidationError, err);
             handlerError(response, DbError, err);
-            handlerError(response, NotFoundIDError, err)
+            handlerError(response, NotFoundIDError, err);
+            handlerError(response, err, err);
         }
     }
 
-    static getTotalTasks(request, response) {
-        // TODO: доделать метод на получение всех задач
+    static async getTotalTasks(request, response) {
+        try {
+            const tasks = await this.repository.getTotalTasks();
+            sendSuccess(response, 200, tasks);
+            return tasks.rows
+        } catch (err) {
+            sendError(response, 400, err);
+        }
     }
     static getIncompleteTasks(request, response) {
         // TODO: доделать метод на получение невыполненных задач

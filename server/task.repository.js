@@ -18,8 +18,10 @@ export class RepositoryTask {
 
     static async getByIdTask(id) {
         try {
+
             let result = await pool.query('SELECT * FROM Task WHERE id = $1', [id]);
-            return result.rows[0]
+            return result.rows[0];
+
         } catch (err) {
             throw new DbError('getById', err)
         }
@@ -27,17 +29,22 @@ export class RepositoryTask {
 
     static async deleteTask(id) {
         try {
+
             let result = await pool.query('DELETE FROM Task WHERE id = $1', [id]);
-            return result
+            return result;
+
         } catch (err) {
             throw new DbError('deleteTask', err)
         }
     }
 
     static async getTotalTasks() {
-        let result = await pool.query('SELECT * FROM Task');
-        if (!result) throw new DbError('getTotalTasks', err);
-        return result
+        try {
+            let result = await pool.query('SELECT * FROM Task');
+            return result;
+        } catch (err) {
+            throw new DbError('getTotalTasks', err);
+        }
     }
 
     static async getIncompleteTasks() {
