@@ -1,6 +1,6 @@
 import { validateTaskFields, validateTaskData, DbError, ValidationError, checkInvalidID, checkEmptyID, NotFoundIDError, EmptyBodyRequestError } from "./validation.js";
 import { Task } from "./task.js";
-import { sendSuccess, handlerError, sendError, sendSuccessForAllTasks } from "./middleware.task.js";
+import { sendSuccess, handlerError, sendError } from "./middleware.task.js";
 
 export default class TaskController {
 
@@ -10,41 +10,59 @@ export default class TaskController {
         this.repository = repo;
     }
 
-    static addTask(request, response) {
-        let body = '';
-        request.on('data', (chunk) => {
-            body += chunk.toString();
-        });
-        request.on('end', async () => {
-            try {
-                if (!body.trim()) {
-                    handlerError(response, EmptyBodyRequestError, new EmptyBodyRequestError)
-                    return;
+    static getRequestBody(request) {
+        return new Promise((resolve, reject) => {
+            let body = '';
+            let totalBytes = 0;
+            let MAX_BYTES = 1024 * 1024; // 1 mb
+            request.on('data', (chunk) => {
+                if (totalBytes <= MAX_BYTES) {
+                    body += chunk.toString();
+                    totalBytes = chunk.length; // это байты
+                } else {
+                    request.destroy();
+                    return reject(new Error('запрос весит выше 1 мб'));
+
                 }
+            });
+            request.on('end', () => resolve(body));
+            request.on('error', (err) => reject(err));
 
-                const data = JSON.parse(body);
-
-                validateTaskFields(data);
-                validateTaskData(data);
-
-                let { title, description, deadline, priority } = data;
-
-                const task = await this.repository.addTask(title, description, deadline, priority);
-
-                const newTask = new Task(title, description, deadline, priority);
-
-                sendSuccess(response, 200, newTask.title);
-                return task;
-
-            } catch (err) {
-                handlerError(response, SyntaxError, err);
-                handlerError(response, ValidationError, err);
-                handlerError(response, DbError, err);
-                sendError(response, 400, err);
-            }
-        });
-
+        })
     }
+
+    static async addTask(request, response) {
+        try {
+            let body = await this.getRequestBody(request);
+            if (!body.trim()) {
+                handlerError(response, EmptyBodyRequestError, new EmptyBodyRequestError)
+                return;
+            }
+
+            const data = JSON.parse(body);
+
+            validateTaskFields(data);
+            validateTaskData(data);
+
+            let { title, description, deadline, priority } = data;
+
+            const task = await this.repository.addTask(title, description, deadline, priority);
+
+            sendSuccess(response, 201, task.rows[0]);
+            return task;
+
+        } catch (err) {
+            if (err instanceof SyntaxError) {
+                return handlerError(response, SyntaxError, err);
+            } else if (err instanceof ValidationError) {
+                return handlerError(response, ValidationError, err);
+            } else if (err instanceof DbError) {
+                return handlerError(response, DbError, err);
+            } else {
+                sendError(response, 500, err);
+            }
+        }
+    };
 
     static async getByIdTask(request, response) {
 
@@ -57,11 +75,11 @@ export default class TaskController {
 
             const res = await this.repository.getByIdTask(task_id);
 
-            if (!res.rows[0]) throw new NotFoundIDError(id);
+            if (!res.rows[0]) throw new NotFoundIDError(task_id);
 
             const { title, description, deadline, priority } = res.rows[0];
 
-            sendSuccess(response, 200, title);
+            sendSuccess(response, 200, res.rows[0]);
 
             return {
                 title: title,
@@ -71,10 +89,15 @@ export default class TaskController {
             };
 
         } catch (err) {
-            handlerError(response, NotFoundIDError, err);
-            handlerError(response, ValidationError, err);
-            handlerError(response, DbError, err);
-            sendError(response, 400, err);
+            if (err instanceof NotFoundIDError) {
+                return handlerError(response, SyntaxError, err);
+            } else if (err instanceof ValidationError) {
+                return handlerError(response, ValidationError, err);
+            } else if (err instanceof DbError) {
+                return handlerError(response, DbError, err);
+            } else {
+                sendError(response, 500, err);
+            }
         }
     }
 
@@ -92,27 +115,32 @@ export default class TaskController {
                 throw new NotFoundIDError(task_id);
             } else {
                 const res = await this.repository.deleteTask(task_id);
-                sendSuccess(response, 200);
+                sendSuccess(response, 204);
                 return res;
             }
 
         } catch (err) {
-            // TODO: ошибка идемпотентности в запросе delete
-            handlerError(response, TypeError, err);
-            handlerError(response, ValidationError, err);
-            handlerError(response, DbError, err);
-            handlerError(response, NotFoundIDError, err);
-            sendError(response, 400, err);
+            if (err instanceof TypeError) {
+                return handlerError(response, TypeError, err);
+            } else if (err instanceof NotFoundIDError) {
+                return handlerError(response, NotFoundIDError, err);
+            } else if (err instanceof ValidationError) {
+                return handlerError(response, ValidationError, err);
+            } else if (err instanceof DbError) {
+                return handlerError(response, DbError, err);
+            } else {
+                sendError(response, 500, err);
+            }
         }
     }
 
     static async getTotalTasks(request, response) {
         try {
             const tasks = await this.repository.getTotalTasks();
-            sendSuccessForAllTasks(response, 200, tasks);
+            sendSuccessForAllTasks(response, 200, tasks.rows[0]);
             return tasks.rows
         } catch (err) {
-            sendError(response, 400, err);
+            sendError(response, 500, err);
         }
     }
     static getIncompleteTasks(request, response) {

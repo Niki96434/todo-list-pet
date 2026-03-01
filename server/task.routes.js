@@ -1,18 +1,21 @@
 import taskController from "./task.controller.js";
 export default function (request, response) {
-    console.log(request.url);
-    console.log(request.method);
+    // TODO: CORS-заголовки
 
     let status = 200;
 
     if (request.url === '/favicon.ico') {
-        status = 204;
+        status = 404;
         response.writeHead(status, { 'Content-Type': 'text/html; charset=utf-8' });
         response.end('этот адрес невалиден')
         return;
     }
-    //
-    if (request.method === 'GET') {
+
+    if (request.method === 'OPTIONS') {
+        response.writeHead(204);
+        response.end();
+
+    } else if (request.method === 'GET') {
         switch (request.url) {
             case '/':
             case '/list-total-tasks':
@@ -30,7 +33,7 @@ export default function (request, response) {
         switch (request.url) {
             case '/':
             default:
-                if (request.url.startsWith('/api/create-task/')) {
+                if (request.url.startsWith('/api/create-task')) {
                     return taskController.addTask(request, response)
                 }
 

@@ -11,16 +11,8 @@ export function sendSuccess(response, status, result = true) {
         result: result
     }));
 }
-export function sendSuccessForAllTasks(response, status, result = true) {
-    response.writeHead(status, { 'Content-Type': 'application/json' });
-    response.end(JSON.stringify({
-        success: true,
-        result: result.rows
-    }));
-}
-export function handlerError(response, ErrorName, err) {
+export function handlerError(response, ErrorName, err, status = 400) {
     if (err instanceof ErrorName) {
-        sendError(response, 400, err);
+        sendError(response, status, err);
     }
-    return;
 }
