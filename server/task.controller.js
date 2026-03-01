@@ -137,18 +137,37 @@ export default class TaskController {
     static async getTotalTasks(request, response) {
         try {
             const tasks = await this.repository.getTotalTasks();
-            sendSuccessForAllTasks(response, 200, tasks.rows[0]);
+            sendSuccess(response, 200, tasks.rows);
             return tasks.rows
         } catch (err) {
             sendError(response, 500, err);
         }
     }
-    static getIncompleteTasks(request, response) {
-        // TODO: доделать метод на получение невыполненных задач
+    static async getIncompleteTasks(request, response) {
+        try {
+            const res = await this.repository.getIncompleteTasks();
+            sendSuccess(response, 200, res.rows)
+            return res;
+
+        } catch (err) {
+            if (err instanceof DbError) {
+                handlerError(response, DbError, err, 500)
+            }
+        }
+
     }
 
-    static getCompleteTasks(request, response) {
-        // TODO: доделать метод на получение выполненных задач
+    static async getCompleteTasks(request, response) {
+        try {
+            const res = await this.repository.getCompletedTasks();
+            sendSuccess(response, 200, res.rows)
+            return res;
+
+        } catch (err) {
+            if (err instanceof DbError) {
+                handlerError(response, DbError, err, 500)
+            }
+        }
     }
 
     // TODO: валидацию везде прочекать и санитайзинг!важно!

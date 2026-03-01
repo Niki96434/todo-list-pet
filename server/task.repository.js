@@ -46,11 +46,22 @@ export class RepositoryTask {
     }
 
     static async getIncompleteTasks() {
-        // TODO: доделать запрос к бд на получение невыполненных задач
+        try {
+            const res = await pool.query('SELECT * FROM Task WHERE completed = false');
+            return res
+        } catch (err) {
+            throw new DbError('getIncompleteTasks', err)
+        }
+
     }
 
-    static async getCompleteTasks() {
-        // TODO: доделать запрос к бд на получение выполненных задач
+    static async getCompletedTasks() {
+        try {
+            const res = await pool.query('SELECT * FROM Task WHERE completed = true');
+            return res
+        } catch (err) {
+            throw new DbError('getIncompleteTasks', err)
+        }
     }
 }
 
