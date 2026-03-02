@@ -1,6 +1,15 @@
+import { corsMiddleware } from "./middleware.task.js";
 import taskController from "./task.controller.js";
 export default function (request, response) {
-    // TODO: CORS-заголовки
+
+    const ALLOWED_ORIGINS = ['http://127.0.0.1:3000', '*'];
+
+    const corsRes = corsMiddleware(request, response, ALLOWED_ORIGINS);
+
+    if (!corsRes) {
+        response.writeHead(403);
+        response.end('Доступ запрещен');
+    }
 
     let status = 200;
 
@@ -14,6 +23,7 @@ export default function (request, response) {
     if (request.method === 'OPTIONS') {
         response.writeHead(204);
         response.end();
+        return;
 
     } else if (request.method === 'GET') {
         switch (request.url) {
