@@ -13,6 +13,7 @@ export class DbError extends AppError {
         this.cause = cause;
     }
 }
+
 export class ValidationError extends ClientError { }
 
 export class NotFoundError extends ClientError { }
@@ -22,6 +23,7 @@ export class NotFoundIDError extends NotFoundError {
         super(id + ' не найдено');
     }
 }
+
 export class EmptyBodyRequestError extends NotFoundError {
     constructor(message) {
         super(message);

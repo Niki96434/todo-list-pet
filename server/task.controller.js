@@ -1,10 +1,38 @@
-import { validateTaskFields, validateTaskData, DbError, ValidationError, checkInvalidID, checkEmptyID, NotFoundIDError, EmptyBodyRequestError } from "./validation.js";
-import { Task } from "./task.js";
+import { validateTaskFields, validateTaskData, DbError, ValidationError, checkInvalidID, checkEmptyID, NotFoundIDError, EmptyBodyRequestError, LoggerError } from "./validation.js";
+import * as fs from 'node:fs/promises';
 import { sendSuccess, handlerError, sendError } from "./middleware.task.js";
+import * as path from 'node:path';
+import { timeStamp } from "node:console";
 
 export default class TaskController {
 
     static repository = null;
+
+    static startTime = new Date();
+
+    static __filename = fileURLToPath(import.meta.url);
+
+    static __dirname = path.dirname(this.__filename);
+
+    static logPath = path.join(this.__dirname, 'logs', 'task-actions.log');
+
+    static logger(content) {
+        try {
+            if (!content) {
+                console.error('пустой входящий контент');
+            }
+
+            entryContent = JSON.stringify({
+                timestamp: new Date(),
+                content: content
+            });
+
+            fs.writeFile(this.logPath, entryContent + '\n');
+
+        } catch (err) {
+            console.error('ошибка логгера' + err.message);
+        }
+    }
 
     static initRepository(repo) {
         this.repository = repo;
@@ -49,6 +77,9 @@ export default class TaskController {
             const task = await this.repository.addTask(title, description, deadline, priority);
 
             sendSuccess(response, 201, task.rows[0]);
+
+            this.logger(task.rows[0]);
+
             return task;
 
         } catch (err) {
@@ -80,6 +111,8 @@ export default class TaskController {
             const { title, description, deadline, priority } = res.rows[0];
 
             sendSuccess(response, 200, res.rows[0]);
+
+            this.logger(res.rows[0]);
 
             return {
                 title: title,
@@ -116,6 +149,7 @@ export default class TaskController {
             } else {
                 const res = await this.repository.deleteTask(task_id);
                 sendSuccess(response, 204);
+                this.logger(true);
                 return res;
             }
 
@@ -138,6 +172,9 @@ export default class TaskController {
         try {
             const tasks = await this.repository.getTotalTasks();
             sendSuccess(response, 200, tasks.rows);
+
+            this.logger(true);
+
             return tasks.rows
         } catch (err) {
             sendError(response, 500, err);
@@ -146,7 +183,10 @@ export default class TaskController {
     static async getIncompleteTasks(request, response) {
         try {
             const res = await this.repository.getIncompleteTasks();
-            sendSuccess(response, 200, res.rows)
+            sendSuccess(response, 200, res.rows);
+
+            this.logger(true);
+
             return res;
 
         } catch (err) {
@@ -160,7 +200,10 @@ export default class TaskController {
     static async getCompleteTasks(request, response) {
         try {
             const res = await this.repository.getCompletedTasks();
-            sendSuccess(response, 200, res.rows)
+            sendSuccess(response, 200, res.rows);
+
+            this.logger(true);
+
             return res;
 
         } catch (err) {

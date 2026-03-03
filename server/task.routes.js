@@ -1,8 +1,12 @@
 import { corsMiddleware } from "./middleware.task.js";
 import taskController from "./task.controller.js";
+
 export default function (request, response) {
 
     const ALLOWED_ORIGINS = ['http://127.0.0.1:3000', '*'];
+
+    let status = 200;
+
 
     const corsRes = corsMiddleware(request, response, ALLOWED_ORIGINS);
 
@@ -10,8 +14,6 @@ export default function (request, response) {
         response.writeHead(403);
         response.end('Доступ запрещен');
     }
-
-    let status = 200;
 
     if (request.url === '/favicon.ico') {
         status = 404;
@@ -35,7 +37,7 @@ export default function (request, response) {
             case '/list-completed-tasks':
                 return taskController.getCompleteTasks(request, response) // выводит завершенные задачи
             default:
-                if (request.url.startsWith('/api/get-task/')) {
+                if (request.url.startsWith('/tasks/')) {
                     return taskController.getByIdTask(request, response)
                 }
         }
@@ -43,13 +45,16 @@ export default function (request, response) {
         switch (request.url) {
             case '/':
             default:
-                if (request.url.startsWith('/api/create-task')) {
+                if (request.url.startsWith('/tasks/')) {
+
+
+
                     return taskController.addTask(request, response)
                 }
 
         }
     } else if (request.method === 'DELETE') {
-        if (request.url.startsWith('/api/delete-task/')) {
+        if (request.url.startsWith('/tasks/')) {
             return taskController.deleteTask(request, response);
         } else {
             response.writeHead(400, { 'Content-Type': 'text/html; charset=utf-8' });
