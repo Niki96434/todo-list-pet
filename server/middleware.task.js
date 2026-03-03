@@ -20,23 +20,19 @@ export function handlerError(response, ErrorName, err, status = 400) {
 }
 
 export function corsMiddleware(request, response, allowed_origins) {
-    // const requestOrigin = request.headers.origin;
-    // console.log(requestOrigin);
+    const requestOrigin = request.headers.origin;
+    console.log(requestOrigin);
+    if (!allowed_origins.includes(requestOrigin)) return false;
 
-    if (allowed_origins.includes('*')) {
-
-        response.setHeader('Access-Control-Allow-Origin', '*');
-        // TODO: заголовки кэширования х1
-        // response.setHeader();
-
-    } else {
-        return false;
-    }
-
+    response.setHeader('Access-Control-Allow-Origin', requestOrigin);
     response.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, PUT, OPTIONS');
-    // response.setHeader('');
+    // response.setHeader('Access-Control-Request-Headers', 'Content-Type, application/json');
+    if (request.method === 'OPTIONS') {
+        response.writeHead(204);
+        response.end();
+        return true
+    }
+    return true
     // TODO: заголовки кэширования х2
 
 }
-
-// TODO: какой-то preflight???

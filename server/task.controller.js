@@ -1,8 +1,8 @@
-import { validateTaskFields, validateTaskData, DbError, ValidationError, checkInvalidID, checkEmptyID, NotFoundIDError, EmptyBodyRequestError, LoggerError } from "./validation.js";
+import { validateTaskFields, validateTaskData, DbError, ValidationError, checkInvalidID, checkEmptyID, NotFoundIDError, EmptyBodyRequestError } from "./validation.js";
 import * as fs from 'node:fs/promises';
 import { sendSuccess, handlerError, sendError } from "./middleware.task.js";
 import * as path from 'node:path';
-import { timeStamp } from "node:console";
+import { fileURLToPath } from 'node:url';
 
 export default class TaskController {
 
@@ -16,21 +16,23 @@ export default class TaskController {
 
     static logPath = path.join(this.__dirname, 'logs', 'task-actions.log');
 
-    static logger(content) {
+    static logger(request, content, event) {
         try {
             if (!content) {
                 console.error('пустой входящий контент');
             }
 
-            entryContent = JSON.stringify({
+            let entryContent = JSON.stringify({
                 timestamp: new Date(),
-                content: content
+                content: content,
+                event: event,
+                method: request.method
             });
 
             fs.writeFile(this.logPath, entryContent + '\n');
 
         } catch (err) {
-            console.error('ошибка логгера' + err.message);
+            console.error('ошибка логгера: ' + err.message);
         }
     }
 
@@ -78,7 +80,7 @@ export default class TaskController {
 
             sendSuccess(response, 201, task.rows[0]);
 
-            this.logger(task.rows[0]);
+            this.logger(request, task.rows[0], 'addTask');
 
             return task;
 
@@ -112,7 +114,7 @@ export default class TaskController {
 
             sendSuccess(response, 200, res.rows[0]);
 
-            this.logger(res.rows[0]);
+            this.logger(request, res.rows[0], 'getByIdTask');
 
             return {
                 title: title,
@@ -148,8 +150,11 @@ export default class TaskController {
                 throw new NotFoundIDError(task_id);
             } else {
                 const res = await this.repository.deleteTask(task_id);
+
                 sendSuccess(response, 204);
-                this.logger(true);
+
+                this.logger(request, `задача с id: ${task_id}`, 'deleteTask');
+
                 return res;
             }
 
@@ -173,19 +178,20 @@ export default class TaskController {
             const tasks = await this.repository.getTotalTasks();
             sendSuccess(response, 200, tasks.rows);
 
-            this.logger(true);
+            this.logger(request, tasks.rows, 'getTotalTasks');
 
             return tasks.rows
         } catch (err) {
             sendError(response, 500, err);
         }
     }
+
     static async getIncompleteTasks(request, response) {
         try {
             const res = await this.repository.getIncompleteTasks();
             sendSuccess(response, 200, res.rows);
 
-            this.logger(true);
+            this.logger(request, res.rows, 'getIncompleteTasks');
 
             return res;
 
@@ -202,7 +208,7 @@ export default class TaskController {
             const res = await this.repository.getCompletedTasks();
             sendSuccess(response, 200, res.rows);
 
-            this.logger(true);
+            this.logger(request, 'success', 'getCompleteTasks');
 
             return res;
 

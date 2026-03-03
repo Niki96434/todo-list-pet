@@ -7,7 +7,6 @@ export default function (request, response) {
 
     let status = 200;
 
-
     const corsRes = corsMiddleware(request, response, ALLOWED_ORIGINS);
 
     if (!corsRes) {
@@ -20,12 +19,6 @@ export default function (request, response) {
         response.writeHead(status, { 'Content-Type': 'text/html; charset=utf-8' });
         response.end('этот адрес невалиден')
         return;
-    }
-
-    if (request.method === 'OPTIONS') {
-        response.writeHead(204);
-        response.end();
-        return;
 
     } else if (request.method === 'GET') {
         switch (request.url) {
@@ -34,7 +27,7 @@ export default function (request, response) {
                 return taskController.getTotalTasks(request, response) // выводит все задачи
             case '/list-incomplete-tasks':
                 return taskController.getIncompleteTasks(request, response) // выводит незавершенные задачи
-            case '/list-completed-tasks':
+            case '/list-complete-tasks':
                 return taskController.getCompleteTasks(request, response) // выводит завершенные задачи
             default:
                 if (request.url.startsWith('/tasks/')) {
