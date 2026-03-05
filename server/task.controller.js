@@ -3,6 +3,7 @@ import * as fs from 'node:fs/promises';
 import { sendSuccess, handlerError, sendError } from "./middleware.task.js";
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { TaskService } from "./task.service.js";
 
 export default class TaskController {
 
@@ -34,10 +35,6 @@ export default class TaskController {
         } catch (err) {
             console.error('ошибка логгера: ' + err.message);
         }
-    }
-
-    static initRepository(repo) {
-        this.repository = repo;
     }
 
     static getRequestBody(request) {
@@ -76,7 +73,7 @@ export default class TaskController {
 
             let { title, description, deadline, priority } = data;
 
-            const task = await this.repository.addTask(title, description, deadline, priority);
+            const task = TaskService.addTask(title, description, deadline, priority);
 
             sendSuccess(response, 201, task.rows[0]);
 
@@ -97,7 +94,7 @@ export default class TaskController {
         }
     };
 
-    static async getByIdTask(request, response) {
+    static getByIdTask(request, response) {
 
         try {
             const task_url = request.url.split('/');
@@ -106,7 +103,7 @@ export default class TaskController {
             checkEmptyID(task_id);
             checkInvalidID(task_id);
 
-            const res = await this.repository.getByIdTask(task_id);
+            const res = TaskService.getByIdTask(task_id);
 
             if (!res.rows[0]) throw new NotFoundIDError(task_id);
 
@@ -136,7 +133,7 @@ export default class TaskController {
         }
     }
 
-    static async deleteTask(request, response) {
+    static deleteTask(request, response) {
         try {
             const task_url = request.url.split('/');
             const task_id = parseInt(task_url.at(-1));
@@ -144,12 +141,12 @@ export default class TaskController {
             checkEmptyID(task_id);
             checkInvalidID(task_id);
 
-            const checkExistingTask = await this.repository.getByIdTask(task_id);
+            const checkExistingTask = TaskService.getByIdTask(task_id);
 
             if (!checkExistingTask.rows[0]) {
                 throw new NotFoundIDError(task_id);
             } else {
-                const res = await this.repository.deleteTask(task_id);
+                const res = TaskService.deleteTask(task_id);
 
                 sendSuccess(response, 204);
 
@@ -175,7 +172,7 @@ export default class TaskController {
 
     static async getTotalTasks(request, response) {
         try {
-            const tasks = await this.repository.getTotalTasks();
+            const tasks = await TaskService.getTotalTasks();
             sendSuccess(response, 200, tasks.rows);
 
             this.logger(request, tasks.rows, 'getTotalTasks');
@@ -186,9 +183,9 @@ export default class TaskController {
         }
     }
 
-    static async getIncompleteTasks(request, response) {
+    static getIncompleteTasks(request, response) {
         try {
-            const res = await this.repository.getIncompleteTasks();
+            const res = TaskService.getIncompleteTasks();
             sendSuccess(response, 200, res.rows);
 
             this.logger(request, res.rows, 'getIncompleteTasks');
@@ -203,9 +200,9 @@ export default class TaskController {
 
     }
 
-    static async getCompleteTasks(request, response) {
+    static getCompleteTasks(request, response) {
         try {
-            const res = await this.repository.getCompletedTasks();
+            const res = TaskService.getCompletedTasks();
             sendSuccess(response, 200, res.rows);
 
             this.logger(request, 'success', 'getCompleteTasks');
