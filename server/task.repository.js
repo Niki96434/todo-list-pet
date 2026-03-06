@@ -1,6 +1,6 @@
 
 import { pool } from "./db.js";
-import { DbError, NotFoundIDError } from "./validation.js";
+import { DbError, NotFoundIDError } from "./errors.js";
 
 export class RepositoryTask {
 

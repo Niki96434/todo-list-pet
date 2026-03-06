@@ -1,49 +1,68 @@
-import { RepositoryTask } from "./task.repository";
-
 export class TaskService {
 
-    #validate() {
+    static #repository;
+    static #validator;
+    static #logger;
+
+    static initRepository(repository, validator, logger) {
+
+        this.#repository = repository;
+        this.#validator = validator;
+        this.#logger = logger;
 
     }
 
-    #validatesmth() {
+    static async addTask({ title, description, deadline, priority }) {
 
-    }
+        this.#validator.validateTaskData(title, description, deadline, priority);
 
-    static initRepository(repo) {
-        this.repository = repo;
-    }
+        const task = await this.#repository.addTask(title, description, deadline, priority);
 
-    static addTask(title, description, deadline, priority) {
-        const task = this.repository.addTask(title, description, deadline, priority);
+        await this.#logger('POST', 'Task added', { taskID: task.id });
+
         return task
     }
 
-    static getByIdTask(id) {
-        const task = this.repository.getByIdTask(id);
+    static async getByIdTask(id) {
+
+        const task = await this.#repository.getByIdTask(id);
+
+        await this.#logger('GET', 'Received a task: ', { taskID: task.id },);
+
         return task
     }
 
-    static deleteTask(id) {
-        this.repository.deleteTask(id);
+    static async deleteTask(id) {
+        await this.#repository.deleteTask(id);
+
+        await this.#logger('DELETE', 'Task deleted', { taskID: task.id });
+
         return true
     }
 
-    static getTotalTasks() {
-        const tasks = this.repository.getTotalTasks();
+    static async getTotalTasks() {
+        const tasks = await this.#repository.getTotalTasks();
+
+        await this.#logger('GET', 'All tasks have been received', { taskID: tasks.rows.map(task => task.id) });
+
         return tasks
     }
 
-    static getIncompleteTasks() {
-        const tasks = this.repository.getIncompleteTasks();
+    static async getIncompleteTasks() {
+        const tasks = await this.#repository.getIncompleteTasks();
+
+        await this.#logger('GET', 'Incomplete tasks have been received', { taskID: tasks.rows.map(task => task.id) });
+
         return tasks
     }
 
-    static getCompletedTasks() {
-        const tasks = this.repository.getCompletedTasks();
+    static async getCompletedTasks() {
+        const tasks = await this.#repository.getCompletedTasks();
+
+        await this.#logger('GET', 'Completed tasks have been received', { taskID: tasks.rows.map(task => task.id) });
+
         return tasks
     }
 }
 
-
-// TODO: дальше писать сервис
+// сервис содержит бизнес-логику, в том числе бизнес-правила для полей

@@ -7,6 +7,8 @@ import { pool } from './db.js';
 import { RepositoryTask } from './task.repository.js';
 import taskController from './task.controller.js';
 import { TaskService } from './task.service.js';
+import { Validator } from './validator.js';
+import { logger } from './logger.js';
 
 
 try {
@@ -42,7 +44,7 @@ async function checkConnectDB() {
 
 checkConnectDB();
 
-TaskService.initRepository(RepositoryTask);
+TaskService.initRepository(RepositoryTask, Validator, logger);
 
 
 server.listen(PORT, HOST, function onServerStatus() {

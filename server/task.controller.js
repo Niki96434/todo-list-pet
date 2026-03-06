@@ -1,9 +1,10 @@
-import { validateTaskFields, validateTaskData, DbError, ValidationError, checkInvalidID, checkEmptyID, NotFoundIDError, EmptyBodyRequestError } from "./validation.js";
+import { DbError, ValidationError, NotFoundIDError, EmptyBodyRequestError } from "./errors.js";
 import * as fs from 'node:fs/promises';
 import { sendSuccess, handlerError, sendError } from "./middleware.task.js";
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { TaskService } from "./task.service.js";
+import { Validator } from "./validator.js";
 
 export default class TaskController {
 
@@ -16,26 +17,6 @@ export default class TaskController {
     static __dirname = path.dirname(this.__filename);
 
     static logPath = path.join(this.__dirname, 'logs', 'task-actions.log');
-
-    static logger(request, content, event) {
-        try {
-            if (!content) {
-                console.error('пустой входящий контент');
-            }
-
-            let entryContent = JSON.stringify({
-                timestamp: new Date(),
-                content: content,
-                event: event,
-                method: request.method
-            });
-
-            fs.writeFile(this.logPath, entryContent + '\n');
-
-        } catch (err) {
-            console.error('ошибка логгера: ' + err.message);
-        }
-    }
 
     static getRequestBody(request) {
         return new Promise((resolve, reject) => {
@@ -68,16 +49,11 @@ export default class TaskController {
 
             const data = JSON.parse(body);
 
-            validateTaskFields(data);
-            validateTaskData(data);
+            Validator.validateTaskFields(data);
 
-            let { title, description, deadline, priority } = data;
-
-            const task = TaskService.addTask(title, description, deadline, priority);
+            const task = await TaskService.addTask(data);
 
             sendSuccess(response, 201, task.rows[0]);
-
-            this.logger(request, task.rows[0], 'addTask');
 
             return task;
 
@@ -94,31 +70,22 @@ export default class TaskController {
         }
     };
 
-    static getByIdTask(request, response) {
+    static async getByIdTask(request, response) {
 
         try {
             const task_url = request.url.split('/');
             const task_id = Number(task_url.at(-1));
 
-            checkEmptyID(task_id);
-            checkInvalidID(task_id);
+            Validator.checkEmptyID(task_id);
+            Validator.checkInvalidID(task_id);
 
-            const res = TaskService.getByIdTask(task_id);
+            const res = await TaskService.getByIdTask(task_id);
 
             if (!res.rows[0]) throw new NotFoundIDError(task_id);
 
-            const { title, description, deadline, priority } = res.rows[0];
-
             sendSuccess(response, 200, res.rows[0]);
 
-            this.logger(request, res.rows[0], 'getByIdTask');
-
-            return {
-                title: title,
-                description: description,
-                deadline: deadline,
-                priority: priority
-            };
+            return { ...res.rows[0] };
 
         } catch (err) {
             if (err instanceof NotFoundIDError) {
@@ -133,25 +100,22 @@ export default class TaskController {
         }
     }
 
-    static deleteTask(request, response) {
+    static async deleteTask(request, response) {
         try {
             const task_url = request.url.split('/');
             const task_id = parseInt(task_url.at(-1));
 
-            checkEmptyID(task_id);
-            checkInvalidID(task_id);
+            Validator.checkEmptyID(task_id);
+            Validator.checkInvalidID(task_id);
 
-            const checkExistingTask = TaskService.getByIdTask(task_id);
+            const task = await TaskService.getByIdTask(task_id);
 
-            if (!checkExistingTask.rows[0]) {
+            if (!task.rows[0]) {
                 throw new NotFoundIDError(task_id);
             } else {
                 const res = TaskService.deleteTask(task_id);
 
                 sendSuccess(response, 204);
-
-                this.logger(request, `задача с id: ${task_id}`, 'deleteTask');
-
                 return res;
             }
 
@@ -172,10 +136,9 @@ export default class TaskController {
 
     static async getTotalTasks(request, response) {
         try {
+
             const tasks = await TaskService.getTotalTasks();
             sendSuccess(response, 200, tasks.rows);
-
-            this.logger(request, tasks.rows, 'getTotalTasks');
 
             return tasks.rows
         } catch (err) {
@@ -183,12 +146,11 @@ export default class TaskController {
         }
     }
 
-    static getIncompleteTasks(request, response) {
+    static async getIncompleteTasks(request, response) {
         try {
-            const res = TaskService.getIncompleteTasks();
-            sendSuccess(response, 200, res.rows);
 
-            this.logger(request, res.rows, 'getIncompleteTasks');
+            const res = await TaskService.getIncompleteTasks();
+            sendSuccess(response, 200, res.rows);
 
             return res;
 
@@ -200,12 +162,10 @@ export default class TaskController {
 
     }
 
-    static getCompleteTasks(request, response) {
+    static async getCompleteTasks(request, response) {
         try {
-            const res = TaskService.getCompletedTasks();
+            const res = await TaskService.getCompletedTasks();
             sendSuccess(response, 200, res.rows);
-
-            this.logger(request, 'success', 'getCompleteTasks');
 
             return res;
 
