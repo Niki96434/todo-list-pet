@@ -1,0 +1,80 @@
+.card-task {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 341px;
+    max-height: 246px;
+    border: 1px solid gray;
+    border-radius: 10px;
+    background-color: white;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.task-content {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    gap: 10px;
+    color: black;
+    max-width: 308px;
+    max-height: 99px;
+}
+
+.img-and-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.task-img {
+    width: 24px;
+    height: 24px;
+}
+
+.task-title {
+    color: black;
+    font-size: 16px;
+}
+
+.status-btn {
+    margin-left: auto;
+    width: 74px;
+    height: 32px;
+    background-color: rgb(223, 223, 223);
+    color: rgb(100, 100, 100);
+    border-radius: 20px;
+}
+
+.task-description-content {
+    color: gray;
+    font-size: 12px;
+    font-weight: 300;
+
+}
+
+.task-deadline-and-priority {
+    display: flex;
+    flex-flow: column nowrap;
+    color: rgb(95, 95, 95);
+    width: 308px;
+    height: 42px;
+}
+
+.img-deadline {
+    width: 18px;
+    height: 18px;
+}
+
+.deadline,
+.priority {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: first baseline;
+    height: 24px;
+}
+
+.img-priority {
+    width: 18px;
+    height: 18px;
+}
