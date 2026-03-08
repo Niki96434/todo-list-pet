@@ -1,3 +1,10 @@
+@font-face {
+    font-family: 'Inter Regular';
+    src: url('frontend/src/shared/fonts/Inter-VariableFont_opsz,wght.ttf') format('ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
 .card-task {
     display: flex;
     flex-direction: column;
@@ -9,6 +16,7 @@
     background-color: white;
     padding: 16px;
     box-sizing: border-box;
+    font-family: 'Inter Regular', sans-serif;
 }
 
 .task-content {
