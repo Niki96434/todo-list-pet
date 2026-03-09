@@ -139,7 +139,7 @@ export default class TaskController {
 
             const tasks = await TaskService.getTotalTasks();
             sendSuccess(response, 200, tasks.rows);
-
+            console.log(tasks.rows);
             return tasks.rows
         } catch (err) {
             sendError(response, 500, err);

@@ -43,7 +43,7 @@ export class TaskService {
     static async getTotalTasks() {
         const tasks = await this.#repository.getTotalTasks();
 
-        await this.#logger('GET', 'All tasks have been received', { taskID: tasks.rows.map(task => task.id) });
+        // await this.#logger('GET', 'All tasks have been received', { taskID: tasks.rows.map(task => task.id) });
 
         return tasks
     }
@@ -51,7 +51,7 @@ export class TaskService {
     static async getIncompleteTasks() {
         const tasks = await this.#repository.getIncompleteTasks();
 
-        await this.#logger('GET', 'Incomplete tasks have been received', { taskID: tasks.rows.map(task => task.id) });
+        // await this.#logger('GET', 'Incomplete tasks have been received', { taskID: tasks.rows.map(task => task.id) });
 
         return tasks
     }
@@ -59,7 +59,7 @@ export class TaskService {
     static async getCompletedTasks() {
         const tasks = await this.#repository.getCompletedTasks();
 
-        await this.#logger('GET', 'Completed tasks have been received', { taskID: tasks.rows.map(task => task.id) });
+        // await this.#logger('GET', 'Completed tasks have been received', { taskID: tasks.rows.map(task => task.id) });
 
         return tasks
     }
