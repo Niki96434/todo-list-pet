@@ -1,10 +1,11 @@
-import TaskCard from '../features/tasks/ui/TaskCard'
+import ListTasks from '../features/tasks/ui/ListTasks'
+
 import './App.css'
 
 function App() {
   return (
     <>
-      <TaskCard title={'Почистить зубы'} description={'Вероник ты уже сутки не чистила зубыероник ты уже сутки не чистила зубыероник ты уже сутки не чистила зубы'} deadline={'7.03.26'} priority={'test'} />
+      <ListTasks />
     </>
   )
 }
