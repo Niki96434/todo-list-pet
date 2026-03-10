@@ -11,13 +11,13 @@ export default function ListTasks() {
         getTaskPropertyAPI(setLoading, setTasks, setError);
     }, []);
     const liTasks = tasks.map((task) => {
-        const { title, description, deadline, priority } = task;
-        <li key={task.id}><TaskCard title={title} description={description} deadline={deadline} priority={priority} /></li>
+
+        return <li key={task.id}><TaskCard {...task} /></li>
     });
 
     if (loading) return <div><p>Загрузка...</p></div>;
     if (error) return <div><p>На сервере произошла ошибка...</p></div>;
-
+    // TODO: обработка варианта "задача не найдена"
     return (
         <>
             <ul>{liTasks}</ul>
