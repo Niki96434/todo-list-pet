@@ -1,7 +1,7 @@
 import { validateTaskFields } from "./validation.js";
 export class Task {
     // #id
-    constructor(title, description, deadline, priority, completed = false) {
+    constructor(title, description, deadline, priority = false, completed = false) {
         // validateTaskFields(title, description, deadline, priority, completed, user_id);
 
         // this.#id = id;

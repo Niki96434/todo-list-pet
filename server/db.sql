@@ -3,7 +3,7 @@ create TABLE Task(
     title VARCHAR(255),
     description VARCHAR(255),
     deadline VARCHAR(255),
-    priority VARCHAR(255),
+    priority BOOLEAN DEFAULT FALSE,
     completed BOOLEAN DEFAULT FALSE,
     user_id INTEGER,
     FOREIGN KEY (user_id) REFERENCES Owner (id)

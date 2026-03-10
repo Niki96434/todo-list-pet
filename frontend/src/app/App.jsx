@@ -1,11 +1,11 @@
-import ListTasks from '../features/tasks/ui/ListTasks'
+import ListTotalTasks from '../features/tasks/ui/ListTotalTasks'
 
 import './App.css'
 
 function App() {
   return (
     <>
-      <ListTasks />
+      <ListTotalTasks />
     </>
   )
 }

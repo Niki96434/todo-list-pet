@@ -52,3 +52,4 @@ server.listen(PORT, HOST, function onServerStatus() {
 
 });
 
+// TODO: писать авторизацию на ноде

@@ -6,87 +6,81 @@
 }
 
 .card-task-container {
-    max-width: 341px;
-    max-height: 246px;
-    border: 1px solid gray;
-    border-radius: 10px;
+    max-width: 336px;
+    max-height: 224px;
+    border-radius: 5px;
+    box-shadow: 0px 2px 3px rgb(201, 201, 201);
     background-color: white;
     padding: 16px;
     box-sizing: border-box;
     font-family: 'Inter Regular', sans-serif;
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 16px;
+
+}
+
+.tag-task,
+.comments,
+.title-and-btn,
+.priority-and-deadline {
+    max-width: 304px;
+    max-height: 24px;
+}
+
+.title-and-btn {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.btn-task-option {
+    width: 18px;
+    height: 18px;
+    background-color: white;
+    border-radius: 5px;
+    border: 1px solid rgb(201, 201, 201);
+    margin-left: auto;
+    padding: 4px;
+    box-sizing: border-box;
+    background-image: url('./more-horizontal.svg');
+    cursor: pointer;
+    box-shadow: 0px 2px 3px rgb(201, 201, 201);
 }
 
 .task-content {
     display: flex;
+    gap: 8px;
     flex-direction: column;
-    color: black;
 }
 
-.img-and-title-and-btn {
-    display: flex;
-    flex-direction: row;
-    max-height: 44px;
-    max-width: 304px;
-    align-content: flex-start;
-}
-
-.task-img {
-    max-width: 24px;
-    height: 24px;
-    margin-right: 5px;
-}
 
 .task-title {
-    color: black;
     font-size: 16px;
-    width: 181px;
-    height: 44px;
-    margin-top: 5px;
+    font-weight: 500;
 }
 
-.status-btn {
-    margin-left: auto;
-    width: 74px;
-    height: 32px;
-    background-color: rgb(223, 223, 223);
-    color: rgb(100, 100, 100);
-    border-radius: 20px;
+.description {
+    max-width: 303px;
+    max-height: 40px;
+    margin-right: auto;
+    font-size: 14px;
+    font-weight: 400;
+    color: gray;
 }
 
-.task-description-content {
-    color: rgb(87, 87, 87);
-    font-size: 12px;
-    font-weight: 300;
-    max-height: 86px;
-    margin-top: auto;
-}
-
-.task-deadline-and-priority-container {
-    display: flex;
-    flex-flow: column nowrap;
-    color: rgb(95, 95, 95);
-    width: 308px;
-    height: 48px;
-}
-
-.img-deadline,
-.img-priority {
-    width: 18px;
-    height: 18px;
-}
-
-.deadline,
-.priority {
+.priority-and-deadline {
     display: flex;
     flex-flow: row nowrap;
-    gap: 4px;
-    max-height: 24px;
     align-items: center;
-}
-
-.deadline,
-.priority>p {
+    color: gray;
     font-size: 12px;
     font-weight: 500;
+    gap: 8px;
+}
 
+.img-priority {
+    width: 14px;
+    height: 15px;
+    padding: 5px;
 }

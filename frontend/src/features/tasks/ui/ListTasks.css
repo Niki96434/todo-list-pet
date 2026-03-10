@@ -1,0 +1,17 @@
+.list-tasks-container {
+    max-width: 1160px;
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    grid-template-rows: auto;
+    background-color: rgb(235, 235, 235);
+    border-radius: 5px;
+    gap: 16px;
+
+}
+
+.list-total-tasks {
+    display: flex;
+    max-width: 352px;
+    flex-direction: column;
+    gap: 12px;
+}
