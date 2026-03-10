@@ -3,7 +3,7 @@ import taskController from "./task.controller.js";
 
 export default function (request, response) {
 
-    const ALLOWED_ORIGINS = ['http://127.0.0.1:3000', '*'];
+    const ALLOWED_ORIGINS = ['http://127.0.0.1:3000', 'http://localhost:5173', '*'];
 
     let status = 200;
 
@@ -56,8 +56,10 @@ export default function (request, response) {
         }
 
     } else {
-        response.writeHead(400, { 'Content-Type': 'text/html; charset=utf-8' });
-        response.end('нет контента')
+        if (!response.headersSent) {
+            response.writeHead(204);
+            response.end('нет контента')
+        }
         return;
     }
 

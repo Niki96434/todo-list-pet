@@ -138,11 +138,20 @@ export default class TaskController {
         try {
 
             const tasks = await TaskService.getTotalTasks();
-            sendSuccess(response, 200, tasks.rows);
-            console.log(tasks.rows);
-            return tasks.rows
+
+            if (!response.headersSent) {
+                sendSuccess(response, 200, tasks.rows);
+                console.log('Ответ отправлен');
+            } else {
+                console.log('Ответ уже отправлен')
+            }
+
         } catch (err) {
-            sendError(response, 500, err);
+            if (!response.headersSent) {
+                sendError(response, 500, err);
+            } else {
+                console.error('Ошибка после отправки ответа:', err);
+            }
         }
     }
 

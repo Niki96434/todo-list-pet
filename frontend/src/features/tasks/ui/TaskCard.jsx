@@ -32,5 +32,5 @@ export default function TaskCard({ title, description, deadline, priority }) {
                 </div>
             </div>
         </div>
-    </>)
+    </>);
 }
