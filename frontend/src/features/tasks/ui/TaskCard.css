@@ -6,7 +6,7 @@
 }
 
 .card-task-container {
-    max-width: 336px;
+    width: 336px;
     max-height: 224px;
     border-radius: 5px;
     box-shadow: 0px 2px 3px rgb(201, 201, 201);
@@ -43,7 +43,7 @@
     margin-left: auto;
     padding: 4px;
     box-sizing: border-box;
-    background-image: url('./more-horizontal.svg');
+    background-image: url('frontend/src/assets/icons/more-horizontal.svg');
     cursor: pointer;
     box-shadow: 0px 2px 3px rgb(201, 201, 201);
 }

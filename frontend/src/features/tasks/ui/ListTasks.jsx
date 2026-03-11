@@ -24,8 +24,18 @@ export default function ListTotalTasks() {
     if (tasks.length === 0) return <div>Задачи не найдены...</div>
 
     return (
-        <>
-            <div className="list-tasks-container">{listTasks}</div>
-        </>
+        <div className="list-tasks-container">
+            <div className="list-task-container">
+                <div className="list-lable">
+                    <p className="content-lable">To do</p>
+                    <div className="lable-icons">
+                        <button className='icon-add-task'></button>
+                        <button className='icon-options-task'></button>
+                    </div>
+                </div>
+                <div className="list-tasks">{listTasks}</div>
+            </div>
+        </div>
+
     )
 }

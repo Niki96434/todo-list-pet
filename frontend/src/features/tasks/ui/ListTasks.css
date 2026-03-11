@@ -1,17 +1,64 @@
 .list-tasks-container {
-    max-width: 1160px;
     display: grid;
-    grid-template-columns: repeat(1, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     grid-template-rows: auto;
-    background-color: rgb(235, 235, 235);
-    border-radius: 5px;
+    grid-template-areas:
+        '.list-task-container .list-task-container .list-task-container';
     gap: 16px;
-
 }
 
-.list-total-tasks {
+.list-tasks {
     display: flex;
-    max-width: 352px;
+    max-width: 336px;
     flex-direction: column;
     gap: 12px;
+    margin: auto;
+}
+
+.list-lable {
+    max-width: 336px;
+    max-height: 24px;
+    padding: 16px 8px;
+    color: gray;
+    font-size: 16px;
+    font-weight: 500;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.content-lable {
+    justify-content: flex-start;
+}
+
+.lable-icons {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    border: 1px solid transparent;
+    margin-left: auto;
+}
+
+.icon-add-task,
+.icon-options-task {
+    width: 16px;
+    height: 16px;
+    padding: 4px;
+    box-sizing: border-box;
+    border: none;
+    cursor: pointer;
+}
+
+.icon-add-task {
+    background-image: url('frontend/src/assets/icons/plus.svg');
+}
+
+.icon-options-task {
+    background-image: url('frontend/src/assets/icons/more-horizontal.svg');
+}
+
+.list-task-container {
+    border-radius: 5px;
+    background-color: rgb(240, 240, 240);
+    width: 352px;
 }

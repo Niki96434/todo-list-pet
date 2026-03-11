@@ -1,4 +1,4 @@
-import ListTotalTasks from '../features/tasks/ui/ListTotalTasks'
+import ListTotalTasks from '../features/tasks/ui/ListTasks'
 
 import './App.css'
 

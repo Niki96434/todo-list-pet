@@ -1,6 +1,8 @@
 import './TaskCard.css'
 import nonPriorityTaskIcon from './VectorNonPriority.svg';
 import PriorityTaskIcon from './VectorPriority.svg';
+import OptionsBtn from '../../../shared/ui/OptionsBtn';
+// TODO: добавить иконки как модули
 
 export default function TaskCard({ title, description, deadline, priority }) {
     (priority) ? priority = PriorityTaskIcon : priority = nonPriorityTaskIcon;
@@ -11,7 +13,7 @@ export default function TaskCard({ title, description, deadline, priority }) {
             <div className='task-content'>
                 <div className='title-and-btn'>
                     <p className='task-title'>{title}</p>
-                    <button className='btn-task-option'></button>
+                    <OptionsBtn />
                 </div>
                 <div className='description'>
                     <p className='task-description-content'>{description}</p>
