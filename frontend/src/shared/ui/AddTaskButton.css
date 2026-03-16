@@ -1,0 +1,8 @@
+.new-task-btn {
+    width: 133px;
+    height: 40px;
+    border-radius: 6px;
+    padding: 24.5px 8px;
+    box-sizing: border-box;
+    background-color: gray;
+}

@@ -7,7 +7,7 @@
     margin-left: auto;
     padding: 4px;
     box-sizing: border-box;
-    background-image: url('frontend/src/assets/icons/more-horizontal.svg');
+    background-image: url('../../assets/icons/more-horizontal.svg');
     cursor: pointer;
     box-shadow: 0px 2px 3px rgb(201, 201, 201);
 }

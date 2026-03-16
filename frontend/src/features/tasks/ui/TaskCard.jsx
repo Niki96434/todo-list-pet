@@ -1,6 +1,6 @@
 import './TaskCard.css'
-import nonPriorityTaskIcon from './VectorNonPriority.svg';
-import PriorityTaskIcon from './VectorPriority.svg';
+import nonPriorityTaskIcon from '../../../assets/icons/VectorNonPriority.svg';
+import PriorityTaskIcon from '../../../assets/icons/VectorPriority.svg';
 import OptionsBtn from '../../../shared/ui/OptionsBtn';
 // TODO: добавить иконки как модули
 
