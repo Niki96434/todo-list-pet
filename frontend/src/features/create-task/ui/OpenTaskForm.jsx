@@ -1,6 +1,6 @@
-import { useState } from "react"
+import { useState } from "react";
 import AddTaskButton from "../../../shared/ui/AddTaskButton";
-import { CreateTaskForm } from "./CreateTaskForm";
+import CreateTaskForm from "./CreateTaskForm";
 
 export default function OpenTaskForm() {
 
@@ -14,8 +14,8 @@ export default function OpenTaskForm() {
     return (
         <>
             <div>
-                <AddTaskButton onOpenForm={() => handleClick(isOpen)}>New Task</AddTaskButton>
-                {{ isOpen }} && <CreateTaskForm />
+                <AddTaskButton handleClick={() => handleClick(isOpen)}>New Task</AddTaskButton>
+                {isOpen && (<CreateTaskForm />)}
             </div>
         </>
     )

@@ -1,6 +1,6 @@
-export default function AddTaskButton({ children, onOpenForm }) {
+export default function AddTaskButton({ children, handleClick }) {
     return (
-        <button className='new-task-btn' onClick={onOpenForm}>
+        <button className='new-task-btn' onClick={handleClick}>
             {children}
         </button>
     )

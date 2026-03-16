@@ -1,0 +1,7 @@
+.section-title,
+.section-description,
+.section-deadline,
+.section-priority {
+    display: flex;
+    flex-direction: column;
+}

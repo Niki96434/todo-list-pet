@@ -1,11 +1,10 @@
-import ListTotalTasks from '../features/tasks/ui/ListTasks'
-
-import './App.css'
+import OpenTaskForm from '../features/create-task/ui/OpenTaskForm';
+import './App.css';
 
 function App() {
   return (
     <>
-      <ListTotalTasks />
+      <OpenTaskForm />
     </>
   )
 }
