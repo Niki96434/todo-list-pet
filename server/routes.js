@@ -1,5 +1,6 @@
-import { corsMiddleware } from "./middleware.task.js";
-import taskController from "./task.controller.js";
+import { corsMiddleware } from "./middlewares/task.middleware.js";
+import taskController from "./controllers/task.controller.js";
+import { authController } from "./controllers/auth.controller.js";
 
 export default function (request, response) {
 
@@ -39,6 +40,10 @@ export default function (request, response) {
             case '/':
             case '/create-task':
                 return taskController.addTask(request, response)
+            case '/auth/register':
+                return authController.register(request, response)
+            case '/auth/login/':
+                return authController.login(request, response)
 
         }
     } else if (request.method === 'DELETE') {

@@ -1,10 +1,10 @@
-import { DbError, ValidationError, NotFoundIDError, EmptyBodyRequestError } from "./errors.js";
+import { DbError, ValidationError, NotFoundIDError, EmptyBodyRequestError } from "../middlewares/errors.js";
 import * as fs from 'node:fs/promises';
-import { sendSuccess, handlerError, sendError } from "./middleware.task.js";
+import { sendSuccess, handlerError, sendError } from "../middlewares/task.middleware.js";
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { TaskService } from "./task.service.js";
-import { Validator } from "./validator.js";
+import { TaskService } from "../services/task.service.js";
+import { Validator } from "../middlewares/validator.js";
 
 export default class TaskController {
 
