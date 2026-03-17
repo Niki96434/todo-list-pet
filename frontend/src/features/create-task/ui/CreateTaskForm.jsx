@@ -1,22 +1,22 @@
-import AddTaskButton from "../../../shared/ui/AddTaskButton"
-import './CreateTaskForm.css'
-import { useRef } from "react"
+import AddTaskButton from "../../../shared/ui/AddTaskButton";
+import './CreateTaskForm.css';
+import { useRef } from "react";
+import sendData from "../api/create-task";
+
 export default function CreateTaskForm() {
 
     let ref = useRef(null);
 
-    function handleFormSubmit(event) {
+    async function handleFormSubmit(event) {
         event.preventDefault();
 
-        const elements = ref.current.elements;
+        const data = new FormData(ref.current);
 
-        const filterArrayElements = Array.from(elements).filter((el) => !!el.name);
+        const dataObj = Object.fromEntries(data.entries());
 
-        const formData = filterArrayElements.map((elem) => {
-            const { name, value } = elem;
-            return { name, value };
-        })
-        console.log(formData)
+        const response = await sendData(JSON.stringify(dataObj));
+
+        return response
     }
 
     return (

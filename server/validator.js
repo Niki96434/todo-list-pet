@@ -18,16 +18,16 @@ export class Validator {
         return true;
     }
 
-    static validateTaskFields({ title, description, deadline, priority }) {
+    static validateTaskFields(title, description, deadline) {
         if (title.trim() === '') throw new EmptyFieldError("title");
         if (description.trim() === '') throw new EmptyFieldError("description");
         if (deadline.trim() === '') throw new EmptyFieldError("deadline");
-        if (priority.trim() === '') throw new EmptyFieldError("priority");
+        // if (priority.trim() === '') throw new EmptyFieldError("priority");
         // if (typeof completed == 'undefined') throw new EmptyFieldError("completed");
         // if (!user_id) throw new EmptyFieldError("user_id");
     }
 
-    static validateTaskData({ title, description, deadline, priority }) {
+    static validateTaskData(title, description, deadline, priority) {
         const TITLE_MIN_LENGTH = 3;
         const TITLE_MAX_LENGTH = 100;
         const DESCRIPTION_MAX_LENGTH = 1000;
@@ -44,7 +44,7 @@ export class Validator {
             throw new InvalidDataError('дедлайн невалиден')
         }
 
-        if (typeof priority !== 'string') {
+        if (priority !== 'boolean') {
             throw new InvalidDataError('Невалидный приоритет')
         }
 

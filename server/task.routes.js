@@ -37,13 +37,8 @@ export default function (request, response) {
     } else if (request.method === 'POST') {
         switch (request.url) {
             case '/':
-            default:
-                if (request.url.startsWith('/tasks/')) {
-
-
-
-                    return taskController.addTask(request, response)
-                }
+            case '/create-task':
+                return taskController.addTask(request, response)
 
         }
     } else if (request.method === 'DELETE') {

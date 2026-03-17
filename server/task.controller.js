@@ -49,7 +49,9 @@ export default class TaskController {
 
             const data = JSON.parse(body);
 
-            Validator.validateTaskFields(data);
+            const { title, description, deadline } = data;
+
+            Validator.validateTaskFields(title, description, deadline);
 
             const task = await TaskService.addTask(data);
 
