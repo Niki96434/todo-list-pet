@@ -1,8 +1,26 @@
 import AddTaskButton from "../../../shared/ui/AddTaskButton"
 import './CreateTaskForm.css'
+import { useRef } from "react"
 export default function CreateTaskForm() {
+
+    let ref = useRef(null);
+
+    function handleFormSubmit(event) {
+        event.preventDefault();
+
+        const elements = ref.current.elements;
+
+        const filterArrayElements = Array.from(elements).filter((el) => !!el.name);
+
+        const formData = filterArrayElements.map((elem) => {
+            const { name, value } = elem;
+            return { name, value };
+        })
+        console.log(formData)
+    }
+
     return (
-        <form action="" method="post" name="add-task" acceptCharset="UNKNOWN">
+        <form ref={ref} action="" method="post" name="add-task" acceptCharset="UNKNOWN">
             <section className="section-title">
                 <label htmlFor="title">
                     <span style={{ color: 'red' }}>*</span> Введите название задачи </label>
@@ -19,19 +37,17 @@ export default function CreateTaskForm() {
                 <input id='deadline' name="deadline" type="text" required />
             </section>
             <section className="section-priority">
-                <fieldset>
-                    <legend> <span style={{ color: 'red' }}>*</span> Определите приоритет задачи</legend>
-                    <label>
-                        <input id='priority' name="priority" type="radio" required />
+                <label htmlFor="pick-priority"> <span style={{ color: 'red' }}>*</span> Определите приоритет задачи</label>
+                <select id='pick-priority' name='priority'>
+                    <option value='true' required >
                         Важно
-                    </label>
-                    <label>
-                        <input id='priority' name="priority" type="radio" required />
+                    </option>
+                    <option value='false'>
                         Не так важно
-                    </label>
-                </fieldset>
+                    </option>
+                </select>
             </section>
-            <AddTaskButton handleClick={() => alert('сохранила тип.')} >Сохранить</AddTaskButton>
+            <AddTaskButton handleClick={handleFormSubmit} >Сохранить</AddTaskButton>
         </form>
     )
 }
