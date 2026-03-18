@@ -1,4 +1,4 @@
-import { corsMiddleware } from "./middlewares/task.middleware.js";
+import { corsMiddleware } from "./middlewares/cors.middleware.js";
 import taskController from "./controllers/task.controller.js";
 import { authController } from "./controllers/auth.controller.js";
 

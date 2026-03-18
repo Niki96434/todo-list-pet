@@ -1,15 +1,16 @@
 import * as http from 'node:http';
 import { loadEnvFile } from 'node:process';
-import handleRequest from './task.routes.js';
+import handleRequest from './routes.js';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { pool } from './db.js';
-import { RepositoryTask } from './task.repository.js';
-import taskController from './task.controller.js';
+import { TaskRepository } from './models/repositories/task.repository.js';
+import checkConnectDB from './utils/checkConnectDB.js';
 import { TaskService } from './task.service.js';
-import { Validator } from './validator.js';
+import { TaskValidator } from './middlewares/task.validator.js';
 import { logger } from './logger.js';
-
+import { AuthRepository } from './models/repositories/auth.repository.js';
+import { AuthValidator } from './middlewares/auth.middleware.js';
 
 try {
     const __filename = fileURLToPath(import.meta.url);
@@ -21,7 +22,6 @@ try {
     process.exit();
 }
 
-
 const server = http.createServer(handleRequest);
 
 const PORT = process.env.PORT || 3000;
@@ -31,25 +31,12 @@ server.on('error', (error) => {
     console.log(`Ошибка сервера:`, error);
 });
 
-async function checkConnectDB() {
-    pool.query(`SELECT NOW()`, (err, res) => {
-        if (!err) {
-            console.log('бд подключилась');
-            const { rows } = res;
-            console.log(rows[0])
-        }
-        return null;
-    })
-}
-
 checkConnectDB();
 
-TaskService.initRepository(RepositoryTask, Validator, logger);
-
+TaskService.init(TaskRepository, TaskValidator, logger);
+AuthService.init(AuthRepository, AuthValidator);
 
 server.listen(PORT, HOST, function onServerStatus() {
     console.log(`Сервер запущен на порту http://${HOST}:${PORT}`);
 
 });
-
-// TODO: писать авторизацию на ноде

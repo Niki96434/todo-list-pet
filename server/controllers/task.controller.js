@@ -4,7 +4,7 @@ import { sendSuccess, handlerError, sendError } from "../middlewares/task.middle
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { TaskService } from "../services/task.service.js";
-import { Validator } from "../middlewares/validator.js";
+import { TaskValidator } from "../middlewares/task.validator.js";
 
 export default class TaskController {
 
@@ -51,7 +51,7 @@ export default class TaskController {
 
             const { title, description, deadline } = data;
 
-            Validator.validateTaskFields(title, description, deadline);
+            TaskValidator.validateTaskFields(title, description, deadline);
 
             const task = await TaskService.addTask(data);
 
@@ -78,8 +78,8 @@ export default class TaskController {
             const task_url = request.url.split('/');
             const task_id = Number(task_url.at(-1));
 
-            Validator.checkEmptyID(task_id);
-            Validator.checkInvalidID(task_id);
+            TaskValidator.checkEmptyID(task_id);
+            TaskValidator.checkInvalidID(task_id);
 
             const res = await TaskService.getByIdTask(task_id);
 
@@ -107,8 +107,8 @@ export default class TaskController {
             const task_url = request.url.split('/');
             const task_id = parseInt(task_url.at(-1));
 
-            Validator.checkEmptyID(task_id);
-            Validator.checkInvalidID(task_id);
+            TaskValidator.checkEmptyID(task_id);
+            TaskValidator.checkInvalidID(task_id);
 
             const task = await TaskService.getByIdTask(task_id);
 

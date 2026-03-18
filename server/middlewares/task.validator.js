@@ -2,7 +2,7 @@ import { InvalidIDError } from "./errors.js";
 import { EmptyFieldError } from "./errors.js";
 import { InvalidDataError } from "./errors.js";
 
-export class Validator {
+export class TaskValidator {
 
     static checkEmptyID(id) {
         if (id === '') {

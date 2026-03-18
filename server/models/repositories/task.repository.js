@@ -1,8 +1,8 @@
 
-import { pool } from "./db.js";
+import { pool } from "../../config/db.js";
 import { DbError } from "./errors.js";
 
-export class RepositoryTask {
+export class TaskRepository {
 
     static async addTask(title, description, deadline, priority) {
         try {

@@ -4,7 +4,7 @@ export class TaskService {
     static #validator;
     static #logger;
 
-    static initRepository(repository, validator, logger) {
+    static init(repository, validator, logger) {
 
         this.#repository = repository;
         this.#validator = validator;
