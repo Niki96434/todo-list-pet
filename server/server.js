@@ -3,14 +3,15 @@ import { loadEnvFile } from 'node:process';
 import handleRequest from './routes.js';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { pool } from './db.js';
 import { TaskRepository } from './models/repositories/task.repository.js';
 import checkConnectDB from './utils/checkConnectDB.js';
 import { TaskService } from './task.service.js';
 import { TaskValidator } from './middlewares/task.validator.js';
 import { logger } from './logger.js';
 import { AuthRepository } from './models/repositories/auth.repository.js';
-import { AuthValidator } from './middlewares/auth.middleware.js';
+import { AuthValidator } from './middlewares/auth.validator.js';
+import { ValidationService } from './services/validation.service.js';
+import { ValidationRepository } from './models/repositories/validation.repository.js';
 
 try {
     const __filename = fileURLToPath(import.meta.url);
@@ -35,6 +36,7 @@ checkConnectDB();
 
 TaskService.init(TaskRepository, TaskValidator, logger);
 AuthService.init(AuthRepository, AuthValidator);
+ValidationService(ValidationRepository);
 
 server.listen(PORT, HOST, function onServerStatus() {
     console.log(`Сервер запущен на порту http://${HOST}:${PORT}`);

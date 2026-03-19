@@ -2,6 +2,8 @@ import AuthValidator from "../middlewares/auth.validator";
 import { EmptyFieldError, InvalidDataError } from "../middlewares/errors";
 import { sendError, sendSuccess } from "../middlewares/task.middleware";
 import AuthService from "../services/auth.service";
+import { ValidationService } from "../services/validation.service";
+import bcrypt from 'bcrypt';
 
 export class authController {
 
@@ -26,12 +28,16 @@ export class authController {
 
             const user = JSON.parse(body);
 
-            const { username, email, password_hash } = user;
+            const { username, email, password } = user;
 
             AuthValidator.validateAuthFields(user);
             AuthValidator.validateAuthData(user);
 
-            const res = await AuthService.createUser(user);
+            const password_hash = bcrypt.hash(password, 10);
+
+            const verifiedPassword = await ValidationService.checkIfExistPassword(password_hash);
+
+            const res = await AuthService.createUser(username, email, verifiedPassword);
 
             sendSuccess(response, 201, username, email);
 

@@ -64,8 +64,5 @@ export default function (request, response) {
     }
 
     // TODO: сделать проверку на поток при запросе
-
 }
-
-
 

@@ -10,4 +10,24 @@ export default class AuthService {
     }
 
     // TODO: писать сервис для авторизации
+
+    static async createUser() {
+
+    }
+
+    static async changePassword() {
+
+    }
+
+    static async changeUsername() {
+
+    }
+
+    static async changeEmail() {
+
+    }
+
+    static async deleteUser() {
+
+    }
 }
