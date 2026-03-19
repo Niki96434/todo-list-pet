@@ -1,11 +1,11 @@
 import AuthValidator from "../middlewares/auth.validator";
-import { EmptyFieldError, InvalidDataError } from "../middlewares/errors";
+import { DbError, EmptyFieldError, InvalidDataError, NotFoundUserError } from "../middlewares/errors";
 import { sendError, sendSuccess } from "../middlewares/task.middleware";
 import AuthService from "../services/auth.service";
 import { ValidationService } from "../services/validation.service";
 import bcrypt from 'bcrypt';
 
-export class authController {
+export class AuthController {
 
     static getRequestBody(request) {
         let body = [];
@@ -21,7 +21,7 @@ export class authController {
             })
     }
 
-    static async register(request, response) {
+    static async signup(request, response) {
         try {
 
             const body = this.getRequestBody(request);
@@ -32,28 +32,56 @@ export class authController {
 
             AuthValidator.validateAuthFields(user);
             AuthValidator.validateAuthData(user);
+            ValidationService.checkIfEmailExist(email);
 
             const password_hash = bcrypt.hash(password, 10);
 
-            const verifiedPassword = await ValidationService.checkIfExistPassword(password_hash);
-
-            const res = await AuthService.createUser(username, email, verifiedPassword);
+            await AuthService.createUser(username, email, password_hash);
 
             sendSuccess(response, 201, username, email);
 
         } catch (err) {
             if (err instanceof EmptyFieldError) {
                 sendError(response, 400, err.message)
-
             } else if (err instanceof InvalidDataError) {
                 sendError(response, 400, err.message)
-            } else if (err instanceof ExistUserError) {
-                sendError(response, 409, err.message)
+            } else if (err instanceof NotFoundUserError) {
+                sendError(response, 404, err.message)
+            } else if (err instanceof DbError) {
+                sendError(response, 404, err.message)
             }
         }
     }
 
-    static login(request, response) {
+    static async login(request, response) {
+        try {
+            const body = this.getRequestBody(request);
+
+            const user = JSON.parse(body);
+
+            const { email, password } = user;
+
+            AuthValidator.validateAuthFields(user);
+            AuthValidator.validateAuthData(user);
+
+            await ValidationService.checkIfEmailExist(email);
+
+            // TODO:  проверить что у кокнкретной почты есть этот пароль
+
+        } catch (err) {
+            if (err instanceof NotFoundUserError) {
+                sendError(response, 404, err);
+            } else if (err instanceof InvalidDataError) {
+                sendError(response, 400, err)
+            } else if (err instanceof EmptyFieldError) {
+                sendError(response, 404, err)
+            } else {
+                sendError(response, 500, err)
+            }
+        }
+
+
+
 
     }
 

@@ -9,12 +9,12 @@ export class ValidationService {
     }
 
     static async checkIfExistPassword(password_hash) {
-        try {
-            const res = await this.#repository.checkIfExistPassword(password_hash)
-            return res
+        const res = await this.#repository.checkIfExistPassword(password_hash)
+        return res
+    }
 
-        } catch (err) {
-            throw new DbError('ошибка проверки пароля', err);
-        }
+    static async checkIfEmailExist(email) {
+        const response = await this.#repository.checkIfEmailExist(email)
+        return response
     }
 }

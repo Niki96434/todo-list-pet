@@ -1,14 +1,19 @@
 import { pool } from '../../config/db';
-import { DbError } from '../../middlewares/errors';
+import { NotFoundUserError } from '../../middlewares/errors';
 export class ValidationRepository {
 
     static async checkIfExistPassword(password_hash) {
-        try {
-            const response = await pool.query('SELECT * FROM Owner WHERE password_hash = $1', [password_hash]);
-            return response
-        } catch (err) {
-            throw new DbError('checkPassword', err);
+        const response = await pool.query('SELECT * FROM Owner WHERE password_hash = $1', [password_hash]);
+        if (!response.rows[0]) {
+            throw new NotFoundUserError('checkPassword', err);
         }
     }
 
+    static async checkIfEmailExist(email) {
+        const response = await pool.query('SELECT * FROM Owner WHERE email = $1', [email]);
+        if (!response.rows[0]) {
+            throw new NotFoundUserError('checkIfEmailExist', err);
+        }
+        return response
+    }
 }

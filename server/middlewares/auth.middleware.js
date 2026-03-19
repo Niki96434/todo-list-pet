@@ -18,7 +18,7 @@ export function sendError(response, status, err) {
     });
 
     response.writeHead(status, {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
     });
 
     response.end(errorData);

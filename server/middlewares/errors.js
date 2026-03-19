@@ -24,6 +24,13 @@ export class NotFoundIDError extends NotFoundError {
     }
 }
 
+export class NotFoundUserError extends NotFoundError {
+    constructor(message) {
+        super(message);
+        this.message = 'Неверный введенный логин или пароль'
+    }
+}
+
 export class EmptyBodyRequestError extends NotFoundError {
     constructor(message) {
         super(message);

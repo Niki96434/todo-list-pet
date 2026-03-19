@@ -1,6 +1,6 @@
 import { corsMiddleware } from "./middlewares/cors.middleware.js";
-import taskController from "./controllers/task.controller.js";
-import { authController } from "./controllers/auth.controller.js";
+import TaskController from "./controllers/task.controller.js";
+import { AuthController } from "./controllers/auth.controller.js";
 
 export default function (request, response) {
 
@@ -25,11 +25,11 @@ export default function (request, response) {
         switch (request.url) {
             case '/':
             case '/list-total-tasks':
-                return taskController.getTotalTasks(request, response) // выводит все задачи
+                return TaskController.getTotalTasks(request, response) // выводит все задачи
             case '/list-incomplete-tasks':
-                return taskController.getIncompleteTasks(request, response) // выводит незавершенные задачи
+                return TaskController.getIncompleteTasks(request, response) // выводит незавершенные задачи
             case '/list-complete-tasks':
-                return taskController.getCompleteTasks(request, response) // выводит завершенные задачи
+                return TaskController.getCompleteTasks(request, response) // выводит завершенные задачи
             default:
                 if (request.url.startsWith('/tasks/')) {
                     return taskController.getByIdTask(request, response)
@@ -39,16 +39,16 @@ export default function (request, response) {
         switch (request.url) {
             case '/':
             case '/create-task':
-                return taskController.addTask(request, response)
-            case '/auth/register':
-                return authController.register(request, response)
-            case '/auth/login/':
-                return authController.login(request, response)
+                return TaskController.addTask(request, response)
+            case '/auth/signup':
+                return AuthController.signup(request, response)
+            case '/auth/login':
+                return AuthController.login(request, response)
 
         }
     } else if (request.method === 'DELETE') {
         if (request.url.startsWith('/tasks/')) {
-            return taskController.deleteTask(request, response);
+            return TaskController.deleteTask(request, response);
         } else {
             response.writeHead(400, { 'Content-Type': 'text/html; charset=utf-8' });
             response.end('нет контента');
