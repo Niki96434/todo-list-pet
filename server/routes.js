@@ -32,12 +32,11 @@ export default function (request, response) {
                 return TaskController.getCompleteTasks(request, response) // выводит завершенные задачи
             default:
                 if (request.url.startsWith('/tasks/')) {
-                    return taskController.getByIdTask(request, response)
+                    return TaskController.getByIdTask(request, response)
                 }
         }
     } else if (request.method === 'POST') {
         switch (request.url) {
-            case '/':
             case '/create-task':
                 return TaskController.addTask(request, response)
             case '/auth/signup':

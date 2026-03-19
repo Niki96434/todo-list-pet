@@ -1,6 +1,6 @@
 
 import { pool } from "../../config/db.js";
-import { DbError } from "./errors.js";
+import { DbError } from "../../middlewares/errors.js";
 
 export class TaskRepository {
 

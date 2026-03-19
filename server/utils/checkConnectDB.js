@@ -1,3 +1,5 @@
+import { pool } from "../config/db.js";
+
 export default async function checkConnectDB() {
     pool.query(`SELECT NOW()`, (err, res) => {
         if (!err) {

@@ -1,5 +1,3 @@
-import { DbError } from "../middlewares/errors";
-
 export class ValidationService {
 
     static #repository;

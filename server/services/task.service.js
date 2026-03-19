@@ -2,13 +2,13 @@ export class TaskService {
 
     static #repository;
     static #validator;
-    static #logger;
+    // static #logger;
 
-    static init(repository, validator, logger) {
+    static init(repository, validator) {
 
         this.#repository = repository;
         this.#validator = validator;
-        this.#logger = logger;
+        // this.#logger = logger;
 
     }
 
@@ -18,7 +18,7 @@ export class TaskService {
 
         const task = await this.#repository.addTask(title, description, deadline, priority);
 
-        await this.#logger('POST', 'Task added', { taskID: task.id });
+        // await this.#logger('POST', 'Task added', { taskID: task.id });
 
         return task
     }
@@ -27,7 +27,7 @@ export class TaskService {
 
         const task = await this.#repository.getByIdTask(id);
 
-        await this.#logger('GET', 'Received a task: ', { taskID: task.id },);
+        // await this.#logger('GET', 'Received a task: ', { taskID: task.id },);
 
         return task
     }
@@ -35,7 +35,7 @@ export class TaskService {
     static async deleteTask(id) {
         await this.#repository.deleteTask(id);
 
-        await this.#logger('DELETE', 'Task deleted', { taskID: task.id });
+        // await this.#logger('DELETE', 'Task deleted', { taskID: task.id });
 
         return true
     }

@@ -5,9 +5,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { TaskRepository } from './models/repositories/task.repository.js';
 import checkConnectDB from './utils/checkConnectDB.js';
-import { TaskService } from './task.service.js';
+import { TaskService } from './services/task.service.js';
 import { TaskValidator } from './middlewares/task.validator.js';
-import { logger } from './logger.js';
+import { logger } from './config/logger.js';
+import AuthService from './services/auth.service.js';
 import { AuthRepository } from './models/repositories/auth.repository.js';
 import { AuthValidator } from './middlewares/auth.validator.js';
 import { ValidationService } from './services/validation.service.js';
@@ -32,11 +33,13 @@ server.on('error', (error) => {
     console.log(`Ошибка сервера:`, error);
 });
 
-checkConnectDB();
+checkConnectDB()
+    .then(console.log)
+    .catch(console.log);
 
-TaskService.init(TaskRepository, TaskValidator, logger);
+TaskService.init(TaskRepository, TaskValidator);
 AuthService.init(AuthRepository, AuthValidator);
-ValidationService(ValidationRepository);
+ValidationService.init(ValidationRepository);
 
 server.listen(PORT, HOST, function onServerStatus() {
     console.log(`Сервер запущен на порту http://${HOST}:${PORT}`);

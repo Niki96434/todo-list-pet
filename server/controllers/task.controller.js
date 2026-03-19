@@ -26,7 +26,7 @@ export default class TaskController {
             request.on('data', (chunk) => {
                 if (totalBytes <= MAX_BYTES) {
                     body += chunk.toString();
-                    totalBytes = chunk.length; // это байты
+                    totalBytes = chunk.length;
                 } else {
                     request.destroy();
                     return reject(new Error('запрос весит выше 1 мб'));

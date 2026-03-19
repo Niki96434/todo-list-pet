@@ -1,6 +1,6 @@
-import { EmptyFieldError, InvalidDataError } from "./errors";
+import { EmptyFieldError, InvalidDataError } from "./errors.js";
 
-export default class AuthValidator {
+export class AuthValidator {
 
     static validateAuthFields({ username, email, password }) {
         if (username.trim() === '') {

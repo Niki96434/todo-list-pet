@@ -1,8 +1,8 @@
-import AuthValidator from "../middlewares/auth.validator";
-import { DbError, EmptyFieldError, InvalidDataError, NotFoundUserError } from "../middlewares/errors";
-import { sendError, sendSuccess } from "../middlewares/task.middleware";
-import AuthService from "../services/auth.service";
-import { ValidationService } from "../services/validation.service";
+import { AuthValidator } from "../middlewares/auth.validator.js";
+import { DbError, EmptyFieldError, InvalidDataError, NotFoundUserError } from "../middlewares/errors.js";
+import { sendError, sendSuccess } from "../middlewares/auth.middleware.js";
+import AuthService from "../services/auth.service.js";
+import { ValidationService } from "../services/validation.service.js";
 import bcrypt from 'bcrypt';
 
 export class AuthController {
@@ -30,11 +30,13 @@ export class AuthController {
 
             const { username, email, password } = user;
 
+            console.log(user);
+
             AuthValidator.validateAuthFields(user);
             AuthValidator.validateAuthData(user);
             ValidationService.checkIfEmailExist(email);
 
-            const password_hash = bcrypt.hash(password, 10);
+            const password_hash = await bcrypt.hash(password, 10);
 
             await AuthService.createUser(username, email, password_hash);
 
@@ -65,8 +67,14 @@ export class AuthController {
             AuthValidator.validateAuthData(user);
 
             await ValidationService.checkIfEmailExist(email);
+            const password_hash = await ValidationService.checkIfExistPassword(email);
+            const verified_password = bcrypt.compare(password, password_hash);
 
-            // TODO:  проверить что у кокнкретной почты есть этот пароль
+            if (!verified_password) {
+                throw new NotFoundUserError('пароль неверный')
+            }
+
+            sendSuccess(response, 200, username, email)
 
         } catch (err) {
             if (err instanceof NotFoundUserError) {
