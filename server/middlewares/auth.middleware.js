@@ -23,3 +23,8 @@ export function sendError(response, status, err) {
 
     response.end(errorData);
 }
+
+export function sendJWT(response, status, token) {
+    response.writeHead(status, { 'Set-Cookie': token });
+    response.end(status);
+}

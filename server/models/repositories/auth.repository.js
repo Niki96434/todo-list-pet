@@ -1,4 +1,5 @@
 import { pool } from '../../config/db.js';
+import { NotFoundUserError } from '../../middlewares/errors.js';
 
 export class AuthRepository {
 
@@ -21,6 +22,14 @@ export class AuthRepository {
 
     async deleteUser() {
 
+    }
+
+    async getUser(email) {
+        const response = await pool.query('SELECT * FROM Owner WHERE email = $1', [email])
+        if (!response.rows[0]) {
+            throw new NotFoundUserError()
+        }
+        return response.rows[0]
     }
 }
 // TODO: писать репозиторий для авторизации

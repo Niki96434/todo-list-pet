@@ -30,4 +30,9 @@ export default class AuthService {
     static async deleteUser() {
 
     }
+
+    static async getUser(email) {
+        const res = await this.#repository.getUser(email);
+        return res
+    }
 }

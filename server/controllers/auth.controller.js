@@ -1,9 +1,11 @@
 import { AuthValidator } from "../middlewares/auth.validator.js";
 import { DbError, EmptyFieldError, InvalidDataError, NotFoundUserError } from "../middlewares/errors.js";
-import { sendError, sendSuccess } from "../middlewares/auth.middleware.js";
+import { sendError, sendSuccess, sendJWT } from "../middlewares/auth.middleware.js";
 import AuthService from "../services/auth.service.js";
 import { ValidationService } from "../services/validation.service.js";
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import SECRET_KEY from '../config/privateKey.js';
 
 export class AuthController {
 
@@ -66,19 +68,25 @@ export class AuthController {
             AuthValidator.validateAuthFields(user);
             AuthValidator.validateAuthData(user);
 
-            await ValidationService.checkIfEmailExist(email);
-            const password_hash = await ValidationService.checkIfExistPassword(email);
-            const verified_password = bcrypt.compare(password, password_hash);
+            const isUserExist = await AuthService.getUser(email);
+
+            console.log(isUserExist);
+
+            const userData = JSON.parse(isUserExist);
+
+            const verified_password = bcrypt.compare(password, userData.password_hash);
 
             if (!verified_password) {
                 throw new NotFoundUserError('пароль неверный')
             }
 
-            sendSuccess(response, 200, username, email)
+            const token = jwt.sign(email, SECRET_KEY, { expiresIn: '1h' });
+
+            sendJWT(response, 200, token)
 
         } catch (err) {
             if (err instanceof NotFoundUserError) {
-                sendError(response, 404, err);
+                sendError(response, 403, err);
             } else if (err instanceof InvalidDataError) {
                 sendError(response, 400, err)
             } else if (err instanceof EmptyFieldError) {
@@ -87,9 +95,6 @@ export class AuthController {
                 sendError(response, 500, err)
             }
         }
-
-
-
 
     }
 
