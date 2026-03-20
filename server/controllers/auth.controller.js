@@ -81,8 +81,11 @@ export class AuthController {
             }
 
             const token = jwt.sign(email, SECRET_KEY, { expiresIn: '1h' });
-
-            sendJWT(response, 200, token)
+            // TODO: отправить токены пользователю либо через куки, либо через заголовок Authorization(не знаю)
+            // TODO: верифицировать токены при запросах пользователя в будущем
+            // TODO: создать папки auth и task для репозиториев контроллеров итд
+            // TODO: создать нормальный токен :)
+            sendJWT(response, 200, token);
 
         } catch (err) {
             if (err instanceof NotFoundUserError) {
