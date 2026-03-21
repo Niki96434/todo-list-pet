@@ -5,7 +5,8 @@ import AuthService from "../services/auth.service.js";
 import { ValidationService } from "../services/validation.service.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import SECRET_KEY from '../config/privateKey.js';
+import '.env';
+import { TokenService } from "../services/token.service.js";
 
 export class AuthController {
 
@@ -40,7 +41,9 @@ export class AuthController {
 
             const password_hash = await bcrypt.hash(password, 10);
 
-            await AuthService.createUser(username, email, password_hash);
+            const tokens = TokenService.generateToken(username, email);
+
+            await AuthService.createUser(username, email, password_hash, tokens);
 
             sendSuccess(response, 201, username, email);
 
@@ -68,11 +71,11 @@ export class AuthController {
             AuthValidator.validateAuthFields(user);
             AuthValidator.validateAuthData(user);
 
-            const isUserExist = await AuthService.getUser(email);
+            const userFromDB = await AuthService.getUser(email);
 
-            console.log(isUserExist);
+            console.log(userFromDB);
 
-            const userData = JSON.parse(isUserExist);
+            const userData = JSON.parse(userFromDB);
 
             const verified_password = bcrypt.compare(password, userData.password_hash);
 
@@ -80,12 +83,11 @@ export class AuthController {
                 throw new NotFoundUserError('пароль неверный')
             }
 
-            const token = jwt.sign(email, SECRET_KEY, { expiresIn: '1h' });
-            // TODO: отправить токены пользователю либо через куки, либо через заголовок Authorization(не знаю)
             // TODO: верифицировать токены при запросах пользователя в будущем
             // TODO: создать папки auth и task для репозиториев контроллеров итд
-            // TODO: создать нормальный токен :)
-            sendJWT(response, 200, token);
+            sendJWT(response, 200, {
+                // TODO: пока непонятно что здесь
+            });
 
         } catch (err) {
             if (err instanceof NotFoundUserError) {

@@ -11,8 +11,9 @@ export default class AuthService {
 
     // TODO: писать сервис для авторизации
 
-    static async createUser() {
-
+    static async createUser(username, email, password_hash, tokens) {
+        const res = await this.#repository.createUser(username, email, password_hash, tokens);
+        return res
     }
 
     static async changePassword() {

@@ -3,8 +3,8 @@ import { NotFoundUserError } from '../../middlewares/errors.js';
 
 export class AuthRepository {
 
-    async createUser(username, email, password_hash) {
-        const response = await pool.query('INSERT INTO Owner (username, email, password_hash) VALUES ($1, $2, $3)', [username, email, password_hash]);
+    async createUser(username, email, password_hash, tokens) {
+        const response = await pool.query('INSERT INTO Owner (username, email, password_hash, tokens) VALUES ($1, $2, $3, $4) RETURNING *', [username, email, password_hash, tokens]);
         return response
     }
 

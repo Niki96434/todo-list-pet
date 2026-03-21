@@ -7,12 +7,13 @@ import { TaskRepository } from './models/repositories/task.repository.js';
 import checkConnectDB from './utils/checkConnectDB.js';
 import { TaskService } from './services/task.service.js';
 import { TaskValidator } from './middlewares/task.validator.js';
-import { logger } from './config/logger.js';
 import AuthService from './services/auth.service.js';
 import { AuthRepository } from './models/repositories/auth.repository.js';
 import { AuthValidator } from './middlewares/auth.validator.js';
 import { ValidationService } from './services/validation.service.js';
 import { ValidationRepository } from './models/repositories/validation.repository.js';
+import { TokenService } from './services/token.service.js';
+import { TokenRepository } from './models/repositories/token.repository.js';
 
 try {
     const __filename = fileURLToPath(import.meta.url);
@@ -39,6 +40,7 @@ checkConnectDB()
 
 TaskService.init(TaskRepository, TaskValidator);
 AuthService.init(AuthRepository, AuthValidator);
+TokenService.init(TokenRepository);
 ValidationService.init(ValidationRepository);
 
 server.listen(PORT, HOST, function onServerStatus() {
